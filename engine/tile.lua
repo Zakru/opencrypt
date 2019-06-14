@@ -9,8 +9,12 @@ function Tile.new(id)
   return t
 end
 
-function Tile.isWalkable()
+function Tile:isWalkable()
+  return true
+end
 
+function Tile:draw()
+  return
 end
 
 return Tile
