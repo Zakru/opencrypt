@@ -2,6 +2,8 @@
 
 (the game)
 
+[Discord](https://discord.gg/Fx4g3hE)
+
 A LÖVE2D powered open source game based on Crypt of the NecroDancer
 
 Disclaimer: This project was not made to re-create CotND, but to create a new, highly customizable community-run game. Zakru or any other OpenCrypt repository admin is not responsible for – and we fact discourage – any external mods for the game which may contain copyright infringing content.
