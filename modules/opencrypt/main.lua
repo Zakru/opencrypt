@@ -22,27 +22,17 @@ function opencryptMod:postLoad(registered, resources)
 
   registered.tiles.wall_breakable_test.floorTile = registered.tiles.floor_test
 
-  registered.entities.player_test.setMoveEvent(self.rightEvent, 1, 0)
-  registered.entities.player_test.setMoveEvent(self.leftEvent, -1, 0)
-  registered.entities.player_test.setMoveEvent(self.downEvent,  0, 1)
-  registered.entities.player_test.setMoveEvent(self.upEvent,    0,-1)
+  registered.entities.player_test:setMoveEvent(self.rightEvent, 1, 0)
+  registered.entities.player_test:setMoveEvent(self.leftEvent, -1, 0)
+  registered.entities.player_test:setMoveEvent(self.downEvent,  0, 1)
+  registered.entities.player_test:setMoveEvent(self.upEvent,    0,-1)
+  registered.entities.player_test:setStepEvent(self.stepEvent)
 
   local mus = self.music.Music:new(resources.sound['music_test.str.ogg'])
   mus:generateBeats(0, 0.5, 128)
   registered.entities.player_test:setAnimator(self.animators.MusicAnimator:new(mus, 1,4, registered.entities.player_test))
 
   registered.entities.enemy_test.giveStepEvent(self.stepEvent)
-
-  function tryStep(pressed)
-    if pressed then
-      self.stepEvent.call()
-    end
-  end
-
-  self.rightEvent.addListener(tryStep)
-  self.leftEvent.addListener(tryStep)
-  self.downEvent.addListener(tryStep)
-  self.upEvent.addListener(tryStep)
 end
 
 function opencryptMod:getInitialWorld()
@@ -73,6 +63,21 @@ function opencryptMod:getInitialWorld()
   resources.sound['music_test.str.ogg']:play()
   world.track = player.camera
   return world
+end
+
+function opencryptMod:update(dt, world)
+  local player_test = self.registered.entities.player_test
+  local progress = player_test.animator.music:progressToNextBeat()
+  local thisBeat = player_test.animator.music.beatIndex
+  if progress < 0.5 then
+    thisBeat = thisBeat - 1
+  end
+  if player_test.lastBeat < thisBeat - 1 then
+    self.stepEvent.call()
+    player_test.lastBeat = thisBeat - 1
+  else
+    player_test.canDoStep = player_test.lastBeat < thisBeat
+  end
 end
 
 return opencryptMod

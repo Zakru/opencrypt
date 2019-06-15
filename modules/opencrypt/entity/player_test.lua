@@ -1,4 +1,5 @@
 local player_test = opencrypt.Creature:newChild()
+player_test.lastBeat = 0
 local instances = {}
 
 local Camera = opencrypt.Entity:newChild()
@@ -20,14 +21,27 @@ function player_test:setAnimator(animator)
   self.animator = animator
 end
 
-function player_test.setMoveEvent(e, x,y)
+function player_test:setMoveEvent(e, x,y)
   e.addListener(function(pressed)
     if pressed then
-      for _,p in ipairs(instances) do
-        p:move(x,y)
+      local progress = player_test.animator.music:progressToNextBeat()
+      local thisBeat = player_test.animator.music.beatIndex
+      if progress < 0.5 then
+        thisBeat = thisBeat - 1
+      end
+      if player_test.lastBeat < thisBeat then
+        for _,p in ipairs(instances) do
+          p:move(x,y)
+        end
+        player_test.stepEvent.call()
+        player_test.lastBeat = thisBeat
       end
     end
   end)
+end
+
+function player_test:setStepEvent(e)
+  self.stepEvent = e
 end
 
 function player_test:getDamage()
