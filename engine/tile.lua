@@ -2,19 +2,25 @@
 local Tile = {}
 Tile.metatable = {__index = Tile}
 
-function Tile.new(id)
-  local t = {namespace=opencrypt.namespace, id=id}
+function Tile.new()
+  local t = {}
 
   setmetatable(t, Tile.metatable)
   return t
+end
+
+function Tile:setTexture(texture)
+  self.texture = texture
 end
 
 function Tile:isWalkable()
   return true
 end
 
-function Tile:draw()
-  return
+function Tile:draw(graphics, x,y)
+  if self.texture then
+    graphics.draw(self.texture, x,y)
+  end
 end
 
 return Tile

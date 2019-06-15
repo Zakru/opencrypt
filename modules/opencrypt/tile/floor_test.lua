@@ -1,3 +1,3 @@
-local floor_test = Tile.new('floor_test')
+local floor_test = opencrypt.Tile.new()
 
-return floor_test;
+return floor_test

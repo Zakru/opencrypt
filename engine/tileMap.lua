@@ -31,7 +31,7 @@ function Tilemap:getTileAt(x,y)
   if t == 0 then
     return nil
   else
-    return palette[t].tile
+    return self.palette[t].tile
   end
 end
 
@@ -46,7 +46,6 @@ end
 local function firstFreePaletteIndex(map)
   for i in incrementIterator() do
     if map.palette[i] == nil then
-      print('got index ' .. i)
       return i
     end
   end
@@ -58,7 +57,7 @@ function Tilemap:setTileAt(x,y, tile)
   end
 
   local t = self.tiles[y][x]
-  if t ~= 0 and self.palette[t].count == 1 then
+  if t ~= 0 and self.palette[t] and self.palette[t].count == 1 then
     self.inversePalette[self.palette[t].tile] = nil
     self.palette[t] = nil 
   elseif t ~= 0 then
@@ -73,7 +72,11 @@ function Tilemap:setTileAt(x,y, tile)
     self.palette[self.inversePalette[tile]].count = self.palette[self.inversePalette[tile]].count + 1
   end
 
-  self.tiles[y][x] = self.inversePalette[tile]
+  if tile ~= nil then
+    self.tiles[y][x] = self.inversePalette[tile]
+  else
+    self.tiles[y][x] = 0
+  end
 end
 
 return Tilemap

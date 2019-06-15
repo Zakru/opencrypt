@@ -1,10 +1,8 @@
 local Mod = {}
 Mod.metatable = {__index = Mod}
 
-function Mod.new(id)
+function Mod.new()
   local m = {}
-
-  m.id = id
 
   setmetatable(m, Mod.metatable)
   return m
@@ -12,6 +10,15 @@ end
 
 function Mod:getInitialWorld()
   return nil
+end
+
+function Mod:preLoad()
+end
+
+function Mod:load()
+end
+
+function Mod:postLoad()
 end
 
 return Mod

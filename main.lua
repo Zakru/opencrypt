@@ -14,5 +14,7 @@ function love.update(dt)
 end
 
 function love.draw()
-  process.renderer:render()
+  modloader.withGlobals(function()
+    process.renderer:render()
+  end)
 end
