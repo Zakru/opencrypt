@@ -28,38 +28,30 @@ function opencryptMod:postLoad(registered, resources)
   registered.entities.player_test:setMoveEvent(self.upEvent,    0,-1)
   registered.entities.player_test:setStepEvent(self.stepEvent)
 
+
   local mus = self.music.Music:new(resources.sound['music_test.str.ogg'])
   mus:generateBeats(0, 0.5, 128)
   registered.entities.player_test:setAnimator(self.animators.MusicAnimator:new(mus, 1,4, registered.entities.player_test))
+  self.mus = mus
 
   registered.entities.enemy_test.giveStepEvent(self.stepEvent)
 end
 
 function opencryptMod:getInitialWorld()
-  local t = opencrypt.Tilemap.new(10, 10)
-  for x=1,10 do
-    for y=1,10 do
-      if x == 1 or x == 10 or y == 1 or y == 10 then
+  local t = opencrypt.Tilemap:new(7, 7)
+  for x=1,7 do
+    for y=1,7 do
+      if x == 1 or x == 7 or y == 1 or y == 7 then
         t:setTileAt(x,y, self.registered.tiles.wall_test)
       else
         t:setTileAt(x,y, self.registered.tiles.floor_test)
       end
     end
   end
-  t:setTileAt(6,5, self.registered.tiles.wall_breakable_test)
-  t:setTileAt(5,6, self.registered.tiles.wall_breakable_test)
-  local world = opencrypt.World.new(t, 24)
-  local player = self.registered.entities.player_test:new(world, 5,5)
+  t:setTileAt(4,5, self.registered.tiles.stairs_down)
+  local world = self.music.MusicWorld:new(self.mus, t, 24)
+  local player = self.registered.entities.player_test:new(world, 4,3)
   world:spawn(player)
-  local enemy1 = self.registered.entities.enemy_test:new(world, 6,9)
-  enemy1:setTarget(player)
-  world:spawn(enemy1)
-  local enemy2 = self.registered.entities.enemy_test:new(world, 7,9)
-  enemy2:setTarget(player)
-  world:spawn(enemy2)
-  local enemy3 = self.registered.entities.enemy_test:new(world, 6,7)
-  enemy3:setTarget(player)
-  world:spawn(enemy3)
   resources.sound['music_test.str.ogg']:play()
   world.track = player.camera
   return world

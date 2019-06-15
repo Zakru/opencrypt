@@ -12,6 +12,15 @@ function Music:new(source, beats)
   return m
 end
 
+function Music:start()
+  self.source:start()
+end
+
+function Music:stop()
+  self.source:stop()
+  self.beatIndex = 1
+end
+
 function Music:progressToNextBeat()
   if self.beatIndex == #self.beats + 1 then
     return 0
@@ -35,5 +44,25 @@ function Music:generateBeats(offset, interval, count)
   end
 end
 
-music = {Music=Music}
+local MusicWorld = opencrypt.World:newChild()
+
+function MusicWorld:new(music, ...)
+  local mw = opencrypt.World.new(self, ...)
+
+  mw.music = music
+
+  return mw
+end
+
+function MusicWorld:begin()
+  opencrypt.World.begin(self)
+end
+
+function MusicWorld:endWorld()
+  if self.music then
+    self.music:stop()
+  end
+end
+
+music = {Music=Music, MusicWorld=MusicWorld}
 return music

@@ -2,7 +2,7 @@
 local World = {}
 World.metatable = {__index = World}
 
-function World.new(tilemap, scale)
+function World:new(tilemap, scale)
   local w = {}
 
   w.tilemap = tilemap
@@ -10,8 +10,19 @@ function World.new(tilemap, scale)
   w.entities = {}
   w.objects = {}
 
-  setmetatable(w, World.metatable)
+  setmetatable(w, self.metatable)
   return w
+end
+
+function World:newChild()
+  local child = {}
+  child.metatable = {__index = child}
+
+  setmetatable(child, self.metatable)
+  return child
+end
+
+function World:begin()
 end
 
 function World:forTiles(func)
@@ -75,6 +86,10 @@ function World:update(dt)
   for _,e in ipairs(self.entities) do
     e:update(dt, self)
   end
+end
+
+function World:endWorld()
+  self.ended = true
 end
 
 return World

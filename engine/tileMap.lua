@@ -4,12 +4,12 @@ local Tile = require('engine/tile')
 local Tilemap = {}
 Tilemap.metatable = {__index = Tilemap}
 
-local emptyTile = Tile.new()
+local emptyTile = Tile:new()
 function emptyTile:isWalkable()
   return false
 end
 
-function Tilemap.new(w,h)
+function Tilemap:new(w,h)
   local t = {}
 
   t.width=w
@@ -25,7 +25,7 @@ function Tilemap.new(w,h)
     end
   end
 
-  setmetatable(t, Tilemap.metatable)
+  setmetatable(t, self.metatable)
   return t
 end
 

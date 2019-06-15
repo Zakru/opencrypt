@@ -3,10 +3,10 @@ local Tile = {}
 Tile.metatable = {__index = Tile}
 Tile.layer = 1
 
-function Tile.new()
+function Tile:new()
   local t = {}
 
-  setmetatable(t, Tile.metatable)
+  setmetatable(t, self.metatable)
   return t
 end
 

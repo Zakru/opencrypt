@@ -1,4 +1,4 @@
-local wall_breakable_test = opencrypt.Tile.new()
+local wall_breakable_test = opencrypt.Tile:new()
 wall_breakable_test.layer = 2
 wall_breakable_test.floorTile = nil
 

@@ -1,4 +1,4 @@
-local wall_test = opencrypt.Tile.new()
+local wall_test = opencrypt.Tile:new()
 wall_test.layer = 2
 
 function wall_test:draw(graphics, x,y)

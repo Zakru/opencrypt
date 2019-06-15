@@ -32,8 +32,13 @@ function Animator:newChild()
   return child
 end
 
-function Animator:draw(graphics, track, progress, x,y)
-  graphics.draw(self.ent.texture, self.quads[track][math.floor(progress * self.frames) + 1], x,y)
+function Animator:draw(graphics, track, progress, x,y, flip)
+  local sx = 1
+  if flip then
+    sx = -1
+  end
+  local xoff = self.ent.texture:getWidth()/2/self.frames
+  graphics.draw(self.ent.texture, self.quads[track][math.floor(progress * self.frames) + 1], xoff+x,y, 0, sx,1, xoff)
 end
 
 local MusicAnimator = Animator:newChild()
@@ -46,8 +51,8 @@ function MusicAnimator:new(music, ...)
   return ma
 end
 
-function MusicAnimator:draw(graphics, track, x,y)
-  Animator.draw(self, graphics, track, self.music:progressToNextBeat(), x,y)
+function MusicAnimator:draw(graphics, track, x,y, flip)
+  Animator.draw(self, graphics, track, self.music:progressToNextBeat(), x,y, flip)
 end
 
 local animators = {Animator=Animator, MusicAnimator=MusicAnimator}
