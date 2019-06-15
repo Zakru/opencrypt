@@ -22,16 +22,23 @@ function Entity:draw(graphics, x,y)
   end
 end
 
-function Entity:move(x,y)
+function Entity:canMove(x,y)
   local newx = self.x + x
   local newy = self.y + y
 
   local tile = self.world.tilemap:getTileAt(newx, newy)
-  if tile and tile:isWalkable() then
+  return tile and tile:isWalkable()
+end
+
+function Entity:move(x,y)
+  local newx = self.x + x
+  local newy = self.y + y
+  if self:canMove(x,y) then
     self.x = newx
     self.y = newy
     return true
   end
+  return false
 end
 
 return Entity

@@ -1,8 +1,8 @@
-local enemy_test = opencrypt.Entity:newChild()
+local enemy_test = opencrypt.Creature:newChild(3)
 local instances = {}
 
 function enemy_test:new(...)
-  local e = opencrypt.Entity.new(self, ...)
+  local e = opencrypt.Creature.new(self, ...)
 
   e.moveNext = false
   e.direction = 'right'
@@ -35,7 +35,7 @@ end
 
 function enemy_test:move()
   local x,y = enemy_test.directionVector(self.direction)
-  opencrypt.Entity.move(self, x,y)
+  opencrypt.Creature.move(self, x,y)
 end
 
 function enemy_test:chooseDirection()
@@ -44,20 +44,20 @@ function enemy_test:chooseDirection()
     local yDiff = self.target.y - self.y
     
     function walkable(x,y)
-      return self.world.tilemap:getTileAt(self.x + x, self.y + y):isWalkable()
+      local tile = self.world.tilemap:getTileAt(self.x + x, self.y + y)
+      local ent = self.world:getFirstEntityAt(self.x + x, self.y + y)
+      return tile and tile:isWalkable() and (not ent or ent == self.target)
     end
 
     function choose()
       if math.abs(yDiff) > math.abs(xDiff) then
         if yDiff > 0 then
           if walkable(0,1) then
-            print('y walkable')
             self.direction = 'down'
             return
           end
         else
           if walkable(0,-1) then
-            print('y walkable')
             self.direction = 'up'
             return
           end
@@ -71,13 +71,11 @@ function enemy_test:chooseDirection()
       else
         if xDiff > 0 then
           if walkable(1,0) then
-            print('x walkable')
             self.direction = 'right'
             return
           end
         else
           if walkable(-1,0) then
-            print('x walkable')
             self.direction = 'left'
             return
           end
@@ -114,6 +112,10 @@ end
 
 function enemy_test:setTarget(t)
   self.target = t
+end
+
+function enemy_test:getDamage()
+  return 1
 end
 
 return enemy_test

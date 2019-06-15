@@ -46,6 +46,15 @@ function World:forEntitiesOnRow(y, func)
   end
 end
 
+function World:getFirstEntityAt(x,y)
+  for e,ent in ipairs(self.entities) do
+    if ent.x == x and ent.y == y then
+      return ent
+    end
+  end
+  return nil
+end
+
 function World:spawn(entity)
   table.insert(self.entities, entity)
 end

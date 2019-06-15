@@ -9,11 +9,12 @@ modloader.events = {}
 modloader.keybinds = {}
 modloader.keyevents = {}
 
-local Tile    = require('engine/tile')
-local Mod     = require('engine/mod')
-local World   = require('engine/world')
+local Tile = require('engine/tile')
+local Mod = require('engine/mod')
+local World = require('engine/world')
 local Tilemap = require('engine/tilemap')
-local Entity  = require('engine/entity')
+local Entity = require('engine/entity')
+local Creature  = require('engine/creature')
 
 local function registerTile(namespace, id, tile)
   if not modloader.tiles[namespace] then modloader.tiles[namespace] = {} end
@@ -83,6 +84,7 @@ local function loadGlobals()
     World=World,
     Tilemap=Tilemap,
     Entity=Entity,
+    Creature=Creature,
   }
 end
 

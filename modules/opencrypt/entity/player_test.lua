@@ -1,8 +1,8 @@
-local player_test = opencrypt.Entity.newChild()
+local player_test = opencrypt.Creature:newChild()
 local instances = {}
 
 function player_test:new(...)
-  local p = opencrypt.Entity.new(self, ...)
+  local p = opencrypt.Creature.new(self, ...)
 
   setmetatable(p, self.metatable)
   table.insert(instances, p)
@@ -17,6 +17,10 @@ function player_test.setMoveEvent(e, x,y)
       end
     end
   end)
+end
+
+function player_test:getDamage()
+  return 1
 end
 
 return player_test
