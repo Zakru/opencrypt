@@ -46,9 +46,15 @@ function opencryptMod:getInitialWorld()
   local world = opencrypt.World.new(t, 24)
   local player = self.registered.entities.player_test:new(world, 5,5)
   world:spawn(player)
-  local enemy = self.registered.entities.enemy_test:new(world, 6,9)
-  enemy:setTarget(player)
-  world:spawn(enemy)
+  local enemy1 = self.registered.entities.enemy_test:new(world, 6,9)
+  enemy1:setTarget(player)
+  world:spawn(enemy1)
+  local enemy2 = self.registered.entities.enemy_test:new(world, 7,9)
+  enemy2:setTarget(player)
+  world:spawn(enemy2)
+  local enemy3 = self.registered.entities.enemy_test:new(world, 6,7)
+  enemy3:setTarget(player)
+  world:spawn(enemy3)
   return world
 end
 

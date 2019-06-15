@@ -1,5 +1,6 @@
 local RenderEngine = require('engine/renderEngine')
 local modloader = require('modloader')
+require('util')
 
 local process = {}
 

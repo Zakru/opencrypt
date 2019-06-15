@@ -1,10 +1,12 @@
 local enemy_test = opencrypt.Creature:newChild(3)
 local instances = {}
+enemy_test.nextMoveNext = false
 
 function enemy_test:new(...)
   local e = opencrypt.Creature.new(self, ...)
 
-  e.moveNext = false
+  e.moveNext = enemy_test.nextMoveNext
+  enemy_test.nextMoveNext = not enemy_test.nextMoveNext
   e.direction = 'right'
 
   setmetatable(e, self.metatable)
@@ -33,9 +35,14 @@ function enemy_test.directionVector(dir)
   return 0,0
 end
 
+function enemy_test:draw(graphics, x,y)
+  opencrypt.Creature.draw(self, graphics, x,y)
+  graphics.print(tostring(self.health), x+12, y+12)
+end
+
 function enemy_test:move()
   local x,y = enemy_test.directionVector(self.direction)
-  opencrypt.Creature.move(self, x,y)
+  return opencrypt.Creature.move(self, x,y)
 end
 
 function enemy_test:chooseDirection()
@@ -45,7 +52,9 @@ function enemy_test:chooseDirection()
     
     function walkable(x,y)
       local tile = self.world.tilemap:getTileAt(self.x + x, self.y + y)
-      local ent = self.world:getFirstEntityAt(self.x + x, self.y + y)
+      local e = table.all(self.world:getEntitiesAt(self.x + x, self.y + y), function(v)
+        return v == self.target or v:isWalkable()
+      end)
       return tile and tile:isWalkable() and (not ent or ent == self.target)
     end
 
@@ -104,10 +113,12 @@ end
 function enemy_test:ai()
   self:chooseDirection()
   if self.moveNext then
-    self:move()
+    if self:move() then
+      self.moveNext = false
+    end
+  else
+    self.moveNext = true
   end
-
-  self.moveNext = not self.moveNext
 end
 
 function enemy_test:setTarget(t)
@@ -116,6 +127,10 @@ end
 
 function enemy_test:getDamage()
   return 1
+end
+
+function enemy_test:willAttack(ent)
+  return ent == self.target
 end
 
 return enemy_test

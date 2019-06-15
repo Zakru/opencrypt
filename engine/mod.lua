@@ -21,7 +21,10 @@ end
 function Mod:postLoad()
 end
 
-function Mod:update(dt)
+function Mod:preUpdate(dt, world)
+end
+
+function Mod:update(dt, world)
 end
 
 return Mod

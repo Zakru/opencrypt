@@ -41,4 +41,11 @@ function Entity:move(x,y)
   return false
 end
 
+function Entity:isWalkable()
+  return false
+end
+
+function Entity:update(dt)
+end
+
 return Entity

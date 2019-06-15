@@ -191,6 +191,12 @@ end
 function modloader.update(dt, world)
   for id,mod in pairs(modloader.mods) do
     loadGlobals()
+    mod:preUpdate(dt, world)
+  end
+  loadGlobals()
+  world:update()
+  for id,mod in pairs(modloader.mods) do
+    loadGlobals()
     mod:update(dt, world)
   end
   unloadGlobals()

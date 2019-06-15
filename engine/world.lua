@@ -55,8 +55,26 @@ function World:getFirstEntityAt(x,y)
   return nil
 end
 
+function World:getEntitiesAt(x,y)
+  local ents = {}
+  for e,ent in ipairs(self.entities) do
+    if ent.x == x and ent.y == y then
+      table.insert(ents, ent)
+    end
+  end
+  return ents
+end
+
 function World:spawn(entity)
-  table.insert(self.entities, entity)
+  if entity.world == self then
+    table.insert(self.entities, entity)
+  end
+end
+
+function World:update(dt)
+  for _,e in ipairs(self.entities) do
+    e:update(dt)
+  end
 end
 
 return World
