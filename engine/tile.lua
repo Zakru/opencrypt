@@ -24,4 +24,7 @@ function Tile:draw(graphics, x,y)
   end
 end
 
+function Tile:onWalkInto(world, x,y, ent)
+end
+
 return Tile

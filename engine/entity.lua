@@ -33,7 +33,8 @@ end
 function Entity:move(x,y)
   local newx = self.x + x
   local newy = self.y + y
-  if self:canMove(x,y) then
+  local tile = self.world.tilemap:getTileAt(newx, newy)
+  if tile and tile:isWalkable() then
     self.x = newx
     self.y = newy
     return true

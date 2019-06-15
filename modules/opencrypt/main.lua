@@ -1,5 +1,11 @@
 local opencryptMod = opencrypt.Mod.new()
 
+function opencryptMod:getSubmodules()
+  return {
+    'animators',
+  }
+end
+
 function opencryptMod:preLoad(registry)
   self.stepEvent = registry.registerEvent('step')
 
@@ -11,6 +17,9 @@ end
 
 function opencryptMod:postLoad(registered)
   self.registered = registered
+
+  registered.tiles.wall_breakable_test.floorTile = registered.tiles.floor_test
+
   registered.entities.player_test.setMoveEvent(self.rightEvent, 1, 0)
   registered.entities.player_test.setMoveEvent(self.leftEvent, -1, 0)
   registered.entities.player_test.setMoveEvent(self.downEvent,  0, 1)
@@ -41,8 +50,8 @@ function opencryptMod:getInitialWorld()
       end
     end
   end
-  t:setTileAt(6,5, self.registered.tiles.wall_test)
-  t:setTileAt(5,6, self.registered.tiles.wall_test)
+  t:setTileAt(6,5, self.registered.tiles.wall_breakable_test)
+  t:setTileAt(5,6, self.registered.tiles.wall_breakable_test)
   local world = opencrypt.World.new(t, 24)
   local player = self.registered.entities.player_test:new(world, 5,5)
   world:spawn(player)

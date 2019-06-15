@@ -77,6 +77,16 @@ local function registerKeybindFactory(registered, namespace)
   end
 end
 
+local function safeCall(modId, func, ...)
+  local args = ... or {}
+  return xpcall(function()
+    func(unpack(args))
+  end, function(err)
+    modloader.mods[modId] = nil
+    print(err)
+  end)
+end
+
 local function loadGlobals()
   _G['opencrypt'] = {
     Tile=Tile,
@@ -107,69 +117,79 @@ function modloader.load()
 
   -- Iterate over module directories
   for _,namespace in ipairs(modDirs) do
-    local modMain = love.filesystem.getInfo('modules/' .. namespace .. '/main.lua')
+    local status, _,_ = safeCall(namespace, function()
+      local modMain = love.filesystem.getInfo('modules/' .. namespace .. '/main.lua')
 
-    -- If the module has a main.lua, require its return value
-    if modMain and modMain.type == 'file' then
-      -- Load global variables with the namespace set to the mod's directory
-      loadGlobals()
-      love.graphics.setDefaultFilter('linear', 'nearest')
-      -- Require the mod
-      modloader.mods[namespace] = require('modules/' .. namespace .. '/main')
-
-      -- LOAD RESOURCES
-      local registered = {}
-      registered.events = {}
-      registered.keyevents = {}
-      modloader.mods[namespace]:preLoad({
-        registerEvent=registerEventFactory(registered, namespace),
-        registerKeybind=registerKeybindFactory(registered, namespace),
-      })
-
-      -- Load tiles
-      registered.tiles = {}
-      for _,filename in ipairs(love.filesystem.getDirectoryItems('modules/' .. namespace .. '/tile')) do
-        if filename:match('%.lua$') then
-          tileId = filename:sub(1, -5)
-          local tile = require('modules/' .. namespace .. '/tile/' .. tileId)
-          tile:setTexture(love.graphics.newImage('modules/' .. namespace .. '/tile/' .. tileId .. '.png'))
-          registered.tiles[tileId] = tile
-          registerTile(namespace, tileId, tile)
+      -- If the module has a main.lua, require its return value
+      if modMain and modMain.type == 'file' then
+        -- Load global variables with the namespace set to the mod's directory
+        loadGlobals()
+        love.graphics.setDefaultFilter('linear', 'nearest')
+        -- Require the mod
+        modloader.mods[namespace] = require('modules/' .. namespace .. '/main')
+        for path in iter(modloader.mods[namespace]:getSubmodules()) do
+          modloader.mods[namespace][path] = require('modules/' .. namespace .. '/' .. path)
+          modloader.mods[namespace][path].mod = modloader.mods[namespace]
         end
-      end
 
-      -- Load entities
-      registered.entities = {}
-      for _,filename in ipairs(love.filesystem.getDirectoryItems('modules/' .. namespace .. '/entity')) do
-        if filename:match('%.lua$') then
-          entityId = filename:sub(1, -5)
-          local entity = require('modules/' .. namespace .. '/entity/' .. entityId)
-          entity.texture = love.graphics.newImage('modules/' .. namespace .. '/entity/' .. entityId .. '.png')
-          registered.entities[entityId] = entity
-          registerEntity(namespace, entityId, entity)
+        -- LOAD RESOURCES
+        local registered = {}
+        registered.events = {}
+        registered.keyevents = {}
+        modloader.mods[namespace]:preLoad({
+          registerEvent=registerEventFactory(registered, namespace),
+          registerKeybind=registerKeybindFactory(registered, namespace),
+        })
+
+        -- Load tiles
+        registered.tiles = {}
+        for _,filename in ipairs(love.filesystem.getDirectoryItems('modules/' .. namespace .. '/tile')) do
+          if filename:match('%.lua$') then
+            tileId = filename:sub(1, -5)
+            local tile = require('modules/' .. namespace .. '/tile/' .. tileId)
+            tile:setTexture(love.graphics.newImage('modules/' .. namespace .. '/tile/' .. tileId .. '.png'))
+            registered.tiles[tileId] = tile
+            registerTile(namespace, tileId, tile)
+          end
         end
-      end
 
-      -- Load objects
-      registered.objects = {}
-      for _,filename in ipairs(love.filesystem.getDirectoryItems('modules/' .. namespace .. '/object')) do
-        if filename:match('%.lua$') then
-          objectId = filename:sub(1, -5)
-          local object = require('modules/' .. namespace .. '/object/' .. objectId)
-          entity.texture = love.graphics.newImage('modules/' .. namespace .. '/object/' .. objectId .. '.png')
-          registered.objects[objectId] = object
-          registerEntity(namespace, objectId, object)
+        -- Load entities
+        registered.entities = {}
+        for _,filename in ipairs(love.filesystem.getDirectoryItems('modules/' .. namespace .. '/entity')) do
+          if filename:match('%.lua$') then
+            entityId = filename:sub(1, -5)
+            local entity = require('modules/' .. namespace .. '/entity/' .. entityId)
+            entity.texture = love.graphics.newImage('modules/' .. namespace .. '/entity/' .. entityId .. '.png')
+            registered.entities[entityId] = entity
+            registerEntity(namespace, entityId, entity)
+          end
         end
+
+        -- Load objects
+        registered.objects = {}
+        for _,filename in ipairs(love.filesystem.getDirectoryItems('modules/' .. namespace .. '/object')) do
+          if filename:match('%.lua$') then
+            objectId = filename:sub(1, -5)
+            local object = require('modules/' .. namespace .. '/object/' .. objectId)
+            entity.texture = love.graphics.newImage('modules/' .. namespace .. '/object/' .. objectId .. '.png')
+            registered.objects[objectId] = object
+            registerEntity(namespace, objectId, object)
+          end
+        end
+
+        modloader.mods[namespace]:load({
+          registerEventListener=registerEventListener,
+        })
+
+        modloader.mods[namespace]:postLoad(registered)
+
+        -- Unload globals
+        unloadGlobals()
       end
+    end)
 
-      modloader.mods[namespace]:load({
-        registerEventListener=registerEventListener,
-      })
-
-      modloader.mods[namespace]:postLoad(registered)
-
-      -- Unload globals
-      unloadGlobals()
+    if not status then
+      print(namespace .. ': An error occurred and this mod was disabled.')
     end
   end
 end
@@ -194,7 +214,9 @@ function modloader.update(dt, world)
     mod:preUpdate(dt, world)
   end
   loadGlobals()
-  world:update()
+  if world then
+    world:update()
+  end
   for id,mod in pairs(modloader.mods) do
     loadGlobals()
     mod:update(dt, world)

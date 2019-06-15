@@ -23,4 +23,8 @@ function player_test:getDamage()
   return 1
 end
 
+function player_test:isStrong()
+  return true
+end
+
 return player_test

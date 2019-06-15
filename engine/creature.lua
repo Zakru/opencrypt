@@ -45,9 +45,15 @@ function Creature:move(x,y)
       end
     else
       Entity.move(self, x,y)
+      self.world.tilemap:getTileAt(newx, newy):onWalkInto(self.world, newx,newy, self)
       return true
     end
   end
+  self.world.tilemap:getTileAt(newx, newy):onWalkInto(self.world, newx,newy, self)
+  return false
+end
+
+function Creature:isStrong()
   return false
 end
 

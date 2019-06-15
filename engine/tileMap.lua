@@ -1,6 +1,13 @@
+local Tile = require('engine/tile')
+
 -- A Tilemap contains a palette of tiles and a 2D-table of numbers corresponding to the tiles in the palette
 local Tilemap = {}
 Tilemap.metatable = {__index = Tilemap}
+
+local emptyTile = Tile.new()
+function emptyTile:isWalkable()
+  return false
+end
 
 function Tilemap.new(w,h)
   local t = {}
@@ -24,12 +31,12 @@ end
 
 function Tilemap:getTileAt(x,y)
   if x < 1 or x > self.width or y < 1 or y > self.height then
-    return nil
+    return emptyTile
   end
 
   local t = self.tiles[y][x]
   if t == 0 then
-    return nil
+    return emptyTile
   else
     return self.palette[t].tile
   end
@@ -53,7 +60,7 @@ end
 
 function Tilemap:setTileAt(x,y, tile)
   if x < 1 or x > self.width or y < 1 or y > self.height then
-    return
+    return 
   end
 
   local t = self.tiles[y][x]
