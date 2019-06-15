@@ -8,6 +8,21 @@ function Entity.new(world, x,y)
   return e
 end
 
+function Entity.newChild()
+  local child = {}
+  child.metatable = {__index = child}
+
+  function child.new(...)
+    local e = opencrypt.Entity.new(...)
+
+    setmetatable(e, child.metatable)
+    return e
+  end
+
+  setmetatable(child, Entity.metatable)
+  return child
+end
+
 function Entity:draw(graphics, x,y)
   if self.texture then
     graphics.draw(self.texture, x,y)
@@ -18,9 +33,11 @@ function Entity:move(x,y)
   local newx = self.x + x
   local newy = self.y + y
 
-  if self.world.tilemap:getTileAt(newx, newy):isWalkable() then
+  local tile = self.world.tilemap:getTileAt(newx, newy)
+  if tile and tile:isWalkable() then
     self.x = newx
     self.y = newy
+    return true
   end
 end
 

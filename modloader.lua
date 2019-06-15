@@ -174,7 +174,7 @@ end
 
 function modloader.getInitialWorld()
   for id,mod in pairs(modloader.mods) do
-    loadGlobals(id)
+    loadGlobals()
     local initialWorld = mod:getInitialWorld()
     if initialWorld then
       unloadGlobals()
@@ -186,14 +186,24 @@ function modloader.getInitialWorld()
   return nil
 end
 
+function modloader.update(dt, world)
+  for id,mod in pairs(modloader.mods) do
+    loadGlobals()
+    mod:update(dt, world)
+  end
+  unloadGlobals()
+end
+
 function modloader.handleKey(key, pressed)
-  for _,keybind in ipairs(modloader.keybinds) do
-    if keybind.key == key then
-      for l,listener in ipairs(keybind.event.listeners) do
-        listener(pressed)
+  modloader.withGlobals(function()
+    for _,keybind in ipairs(modloader.keybinds) do
+      if keybind.key == key then
+        for l,listener in ipairs(keybind.event.listeners) do
+          listener(pressed)
+        end
       end
     end
-  end
+  end)
 end
 
 return modloader

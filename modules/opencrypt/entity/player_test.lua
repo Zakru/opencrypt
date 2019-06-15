@@ -1,5 +1,4 @@
-local player_test = {}
-player_test.metatable = {__index = player_test}
+local player_test = opencrypt.Entity.newChild()
 local instances = {}
 
 function player_test.new(...)
@@ -20,5 +19,4 @@ function player_test.setMoveEvent(e, x,y)
   end)
 end
 
-setmetatable(player_test, opencrypt.Entity.metatable)
 return player_test

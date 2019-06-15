@@ -21,4 +21,7 @@ end
 function Mod:postLoad()
 end
 
+function Mod:update(dt)
+end
+
 return Mod

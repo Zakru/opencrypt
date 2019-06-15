@@ -10,7 +10,7 @@ function love.load()
 end
 
 function love.update(dt)
-
+  modloader.update(dt, process.renderer.world)
 end
 
 function love.draw()
