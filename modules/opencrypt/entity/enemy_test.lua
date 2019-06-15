@@ -55,19 +55,19 @@ function enemy_test:chooseDirection()
       local e = table.all(self.world:getEntitiesAt(self.x + x, self.y + y), function(v)
         return v == self.target or v:isWalkable()
       end)
-      return tile and tile:isWalkable() and (not ent or ent == self.target)
+      return tile and tile:isWalkable() and e
     end
 
     function choose()
       if math.abs(yDiff) > math.abs(xDiff) then
         if yDiff > 0 then
+          self.direction = 'down'
           if walkable(0,1) then
-            self.direction = 'down'
             return
           end
         else
+          self.direction = 'up'
           if walkable(0,-1) then
-            self.direction = 'up'
             return
           end
         end
@@ -79,13 +79,13 @@ function enemy_test:chooseDirection()
         end
       else
         if xDiff > 0 then
+          self.direction = 'right'
           if walkable(1,0) then
-            self.direction = 'right'
             return
           end
         else
+          self.direction = 'left'
           if walkable(-1,0) then
-            self.direction = 'left'
             return
           end
         end
