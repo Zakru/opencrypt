@@ -1,13 +1,13 @@
-local enemy_test = opencrypt.Entity.newChild()
+local enemy_test = opencrypt.Entity:newChild()
 local instances = {}
 
-function enemy_test.new(...)
-  local e = opencrypt.Entity.new(...)
+function enemy_test:new(...)
+  local e = opencrypt.Entity:new(...)
 
   e.moveNext = false
   e.direction = 'right'
 
-  setmetatable(e, enemy_test.metatable)
+  setmetatable(e, self.metatable)
   table.insert(instances, e)
   return e
 end

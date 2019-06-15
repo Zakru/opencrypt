@@ -1,25 +1,18 @@
 local Entity = {}
 Entity.metatable = {__index = Entity}
 
-function Entity.new(world, x,y)
+function Entity:new(world, x,y)
   local e = {world=world, x=x,y=y}
 
-  setmetatable(e, Entity.metatable)
+  setmetatable(e, self.metatable)
   return e
 end
 
-function Entity.newChild()
+function Entity:newChild()
   local child = {}
   child.metatable = {__index = child}
 
-  function child.new(...)
-    local e = Entity.new(...)
-
-    setmetatable(e, child.metatable)
-    return e
-  end
-
-  setmetatable(child, Entity.metatable)
+  setmetatable(child, self.metatable)
   return child
 end
 
