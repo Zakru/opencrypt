@@ -24,9 +24,31 @@ function Animator:new(tracks, frames, ent)
   return a
 end
 
+function Animator:newChild()
+  local child = {}
+  child.metatable = {__index = child}
+
+  setmetatable(child, self.metatable)
+  return child
+end
+
 function Animator:draw(graphics, track, progress, x,y)
   graphics.draw(self.ent.texture, self.quads[track][math.floor(progress * self.frames) + 1], x,y)
 end
 
-local animators = {Animator=Animator}
+local MusicAnimator = Animator:newChild()
+
+function MusicAnimator:new(music, ...)
+  local ma = Animator.new(self, ...)
+
+  ma.music = music
+
+  return ma
+end
+
+function MusicAnimator:draw(graphics, track, x,y)
+  Animator.draw(self, graphics, track, self.music:progressToNextBeat(), x,y)
+end
+
+local animators = {Animator=Animator, MusicAnimator=MusicAnimator}
 return animators

@@ -16,8 +16,9 @@ function opencryptMod:preLoad(registry)
   self.upEvent = registry.registerKeybind('up', 'up')
 end
 
-function opencryptMod:postLoad(registered)
+function opencryptMod:postLoad(registered, resources)
   self.registered = registered
+  self.resources = resources
 
   registered.tiles.wall_breakable_test.floorTile = registered.tiles.floor_test
 
@@ -26,7 +27,9 @@ function opencryptMod:postLoad(registered)
   registered.entities.player_test.setMoveEvent(self.downEvent,  0, 1)
   registered.entities.player_test.setMoveEvent(self.upEvent,    0,-1)
 
-  registered.entities.player_test:setAnimator(self.animators.Animator:new(1,4, registered.entities.player_test))
+  local mus = self.music.Music:new(resources.sound['music_test.str.ogg'])
+  mus:generateBeats(0, 0.5, 128)
+  registered.entities.player_test:setAnimator(self.animators.MusicAnimator:new(mus, 1,4, registered.entities.player_test))
 
   registered.entities.enemy_test.giveStepEvent(self.stepEvent)
 
@@ -67,6 +70,7 @@ function opencryptMod:getInitialWorld()
   local enemy3 = self.registered.entities.enemy_test:new(world, 6,7)
   enemy3:setTarget(player)
   world:spawn(enemy3)
+  resources.sound['music_test.str.ogg']:play()
   return world
 end
 

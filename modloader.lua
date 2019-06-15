@@ -189,7 +189,7 @@ function modloader.load()
           if filename:match('%.ogg$') then
             local type = 'static'
             if filename:match('%.str%.ogg$') then type = 'stream' end
-            resources.sound[filename] = love.audio.newSource('modules/' .. namespace .. '/object/' .. filename, type)
+            resources.sound[filename] = love.audio.newSource('modules/' .. namespace .. '/resource/' .. filename, type)
           end
         end
 

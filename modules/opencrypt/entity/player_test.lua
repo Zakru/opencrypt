@@ -39,7 +39,7 @@ end
 
 function player_test:draw(graphics, x,y)
   if self.animator then
-    self.animator:draw(graphics, 1, self.time % 1, x,y)
+    self.animator:draw(graphics, 1, x,y)
   end
 end
 
