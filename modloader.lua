@@ -6,6 +6,8 @@ modloader.entities = {}
 modloader.objects = {}
 modloader.generators = {}
 modloader.events = {}
+modloader.keybinds = {}
+modloader.keyevents = {}
 
 local Tile    = require('engine/tile')
 local Mod     = require('engine/mod')
@@ -33,22 +35,44 @@ local function registerGenerator(namespace, id, generator)
   modloader.generators[namespace][id] = generator
 end
 
-local function registerEventFactory(namespace)
+local function registerEventFactory(registered, namespace)
   return function(id)
     if not modloader.events[namespace] then modloader.events[namespace] = {} end
     local e = {}
+    e.listeners = {}
     modloader.events[namespace][id] = e
-    return function(...)
-      for l,listener in ipairs(e) do
+    registered.events[id] = e
+
+    function e.addListener(listener)
+      table.insert(e.listeners, listener)
+    end
+
+    function e.call(...)
+      for l,listener in ipairs(e.listeners) do
         listener(...)
       end
     end
+
+    return e
   end
 end
 
-local function registerEventListener(namespace, id, listener)
-  if modloader.events[namespace] and modloader.events[namespace][id] then
-    table.insert(modloader.events[namespace][id], listener)
+local function registerKeybindFactory(registered, namespace)
+  return function(id, defaultKey)
+    if not modloader.keyevents[namespace] then modloader.keyevents[namespace] = {} end
+    local e = {}
+    e.listeners = {}
+    e.keybind = {key=defaultKey, event=e}
+    modloader.keyevents[namespace][id] = e
+    registered.keyevents[id] = e
+
+    function e.addListener(listener)
+      table.insert(e.listeners, listener)
+    end
+
+    table.insert(modloader.keybinds, e.keybind)
+
+    return e
   end
 end
 
@@ -90,12 +114,15 @@ function modloader.load()
       love.graphics.setDefaultFilter('linear', 'nearest')
       -- Require the mod
       modloader.mods[namespace] = require('modules/' .. namespace .. '/main')
-      modloader.mods[namespace]:preLoad({
-        registerEvent=registerEventFactory(namespace),
-      })
 
       -- LOAD RESOURCES
       local registered = {}
+      registered.events = {}
+      registered.keyevents = {}
+      modloader.mods[namespace]:preLoad({
+        registerEvent=registerEventFactory(registered, namespace),
+        registerKeybind=registerKeybindFactory(registered, namespace),
+      })
 
       -- Load tiles
       registered.tiles = {}
@@ -157,6 +184,16 @@ function modloader.getInitialWorld()
 
   unloadGlobals()
   return nil
+end
+
+function modloader.handleKey(key, pressed)
+  for _,keybind in ipairs(modloader.keybinds) do
+    if keybind.key == key then
+      for l,listener in ipairs(keybind.event.listeners) do
+        listener(pressed)
+      end
+    end
+  end
 end
 
 return modloader

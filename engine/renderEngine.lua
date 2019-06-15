@@ -23,7 +23,6 @@ function RenderEngine:render()
 
   if self.world then
     self.world:forTileRows(function(row, y)
-
       self.world:forTilesInRow(row, function(tile, x)
         tile:draw(love.graphics, (x-1)*self.world.scale, (y-1)*self.world.scale)
       end)

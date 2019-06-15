@@ -18,3 +18,15 @@ function love.draw()
     process.renderer:render()
   end)
 end
+
+function love.keypressed(key, _, isrepeat)
+  if not isrepeat then
+    modloader.handleKey(key, true)
+  end
+end
+
+function love.keyreleased(key)
+  if not isrepeat then
+    modloader.handleKey(key, false)
+  end
+end

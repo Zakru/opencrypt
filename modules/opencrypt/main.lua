@@ -1,11 +1,18 @@
 local opencryptMod = opencrypt.Mod.new()
 
-function opencryptMod:load(registry)
-  registry.registerEventListener('')
+function opencryptMod:preLoad(registry)
+  registry.registerKeybind('right', 'right')
+  registry.registerKeybind('left', 'left')
+  registry.registerKeybind('down', 'down')
+  registry.registerKeybind('up', 'up')
 end
 
 function opencryptMod:postLoad(registered)
   self.registered = registered
+  registered.entities.player_test.setMoveEvent(registered.keyevents.right, 1, 0)
+  registered.entities.player_test.setMoveEvent(registered.keyevents.left, -1, 0)
+  registered.entities.player_test.setMoveEvent(registered.keyevents.down,  0, 1)
+  registered.entities.player_test.setMoveEvent(registered.keyevents.up,    0,-1)
 end
 
 function opencryptMod:getInitialWorld()
@@ -19,12 +26,9 @@ function opencryptMod:getInitialWorld()
       end
     end
   end
-  return opencrypt.World.new(
-    t,
-    {self.registered.entities.player_test.new(5,5)},
-    {},
-    24
-  )
+  local world = opencrypt.World.new(t, 24)
+  world:spawn(self.registered.entities.player_test.new(world, 5,5))
+  return world
 end
 
 return opencryptMod

@@ -2,13 +2,13 @@
 local World = {}
 World.metatable = {__index = World}
 
-function World.new(tilemap, entities, objects, scale)
+function World.new(tilemap, scale)
   local w = {}
 
   w.tilemap = tilemap
-  w.entities = entities
-  w.objects = objects
   w.scale = scale -- Size of one tile
+  w.entities = {}
+  w.objects = {}
 
   setmetatable(w, World.metatable)
   return w
@@ -44,6 +44,10 @@ function World:forEntitiesOnRow(y, func)
       func(ent)
     end
   end
+end
+
+function World:spawn(entity)
+  table.insert(self.entities, entity)
 end
 
 return World
