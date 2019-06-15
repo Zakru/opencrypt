@@ -2,7 +2,7 @@ local enemy_test = opencrypt.Entity:newChild()
 local instances = {}
 
 function enemy_test:new(...)
-  local e = opencrypt.Entity:new(...)
+  local e = opencrypt.Entity.new(self, ...)
 
   e.moveNext = false
   e.direction = 'right'

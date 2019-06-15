@@ -2,7 +2,7 @@ local player_test = opencrypt.Entity.newChild()
 local instances = {}
 
 function player_test:new(...)
-  local p = opencrypt.Entity:new(...)
+  local p = opencrypt.Entity.new(self, ...)
 
   setmetatable(p, self.metatable)
   table.insert(instances, p)
