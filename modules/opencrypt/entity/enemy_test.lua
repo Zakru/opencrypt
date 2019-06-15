@@ -104,9 +104,8 @@ function enemy_test:chooseDirection()
 end
 
 function enemy_test:ai()
-  print('ai')
+  self:chooseDirection()
   if self.moveNext then
-    self:chooseDirection()
     self:move()
   end
 

@@ -1,6 +1,7 @@
 -- A Tile is a static object in the world, which can be used in a Tilemap
 local Tile = {}
 Tile.metatable = {__index = Tile}
+Tile.layer = 1
 
 function Tile.new()
   local t = {}

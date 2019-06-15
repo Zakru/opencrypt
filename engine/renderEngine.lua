@@ -22,13 +22,34 @@ function RenderEngine:render()
   love.graphics.scale(2,2) -- This should be calculated from resolution in the future
 
   if self.world then
+    -- Render layer 1
     self.world:forTileRows(function(row, y)
       self.world:forTilesInRow(row, function(tile, x)
-        tile:draw(love.graphics, (x-1)*self.world.scale, (y-1)*self.world.scale)
+        if tile.layer == 1 then
+          tile:draw(love.graphics, (x-1)*self.world.scale, (y-1)*self.world.scale)
+        end
+      end)
+    end)
+
+    -- Render layer 2 and entities
+    self.world:forTileRows(function(row, y)
+      self.world:forTilesInRow(row, function(tile, x)
+        if tile.layer == 2 then
+          tile:draw(love.graphics, (x-1)*self.world.scale, (y-1)*self.world.scale)
+        end
       end)
 
       self.world:forEntitiesOnRow(y, function(ent)
         ent:draw(love.graphics, (ent.x-1)*self.world.scale, (ent.y-1)*self.world.scale)
+      end)
+    end)
+
+    -- Render layer 3
+    self.world:forTileRows(function(row, y)
+      self.world:forTilesInRow(row, function(tile, x)
+        if tile.layer == 3 then
+          tile:draw(love.graphics, (x-1)*self.world.scale, (y-1)*self.world.scale)
+        end
       end)
     end)
   end

@@ -13,7 +13,7 @@ function Entity.newChild()
   child.metatable = {__index = child}
 
   function child.new(...)
-    local e = opencrypt.Entity.new(...)
+    local e = Entity.new(...)
 
     setmetatable(e, child.metatable)
     return e
