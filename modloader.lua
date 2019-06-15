@@ -87,6 +87,10 @@ local function safeCall(modId, func, ...)
   end)
 end
 
+local function getMod(name)
+  return modloader.mods[name]
+end
+
 local function loadGlobals()
   _G['opencrypt'] = {
     Tile=Tile,
@@ -95,6 +99,7 @@ local function loadGlobals()
     Tilemap=Tilemap,
     Entity=Entity,
     Creature=Creature,
+    getMod=getMod,
   }
 end
 
@@ -177,11 +182,22 @@ function modloader.load()
           end
         end
 
+        -- Load miscellaneous resources
+        resources = {}
+        resources.sound = {}
+        for _,filename in ipairs(love.filesystem.getDirectoryItems('modules/' .. namespace .. '/resource')) do
+          if filename:match('%.ogg$') then
+            local type = 'static'
+            if filename:match('%.str%.ogg$') then type = 'stream' end
+            resources.sound[filename] = love.audio.newSource('modules/' .. namespace .. '/object/' .. filename, type)
+          end
+        end
+
         modloader.mods[namespace]:load({
           registerEventListener=registerEventListener,
         })
 
-        modloader.mods[namespace]:postLoad(registered)
+        modloader.mods[namespace]:postLoad(registered, resources)
 
         -- Unload globals
         unloadGlobals()
@@ -215,7 +231,7 @@ function modloader.update(dt, world)
   end
   loadGlobals()
   if world then
-    world:update()
+    world:update(dt)
   end
   for id,mod in pairs(modloader.mods) do
     loadGlobals()

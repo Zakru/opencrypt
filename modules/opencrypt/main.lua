@@ -3,6 +3,7 @@ local opencryptMod = opencrypt.Mod.new()
 function opencryptMod:getSubmodules()
   return {
     'animators',
+    'music',
   }
 end
 
@@ -24,6 +25,8 @@ function opencryptMod:postLoad(registered)
   registered.entities.player_test.setMoveEvent(self.leftEvent, -1, 0)
   registered.entities.player_test.setMoveEvent(self.downEvent,  0, 1)
   registered.entities.player_test.setMoveEvent(self.upEvent,    0,-1)
+
+  registered.entities.player_test:setAnimator(self.animators.Animator:new(1,4, registered.entities.player_test))
 
   registered.entities.enemy_test.giveStepEvent(self.stepEvent)
 

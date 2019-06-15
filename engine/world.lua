@@ -73,7 +73,7 @@ end
 
 function World:update(dt)
   for _,e in ipairs(self.entities) do
-    e:update(dt)
+    e:update(dt, self)
   end
 end
 
