@@ -12,6 +12,14 @@ A tool may be created in the future which allows for copying the contents of a l
 
 OpenCrypt and the contents of this repository have absolutely no warranty, express or implied. A better license should probably be used at some point.
 
+## How to play
+
+To play this game from source, you will need [LÖVE](https://love2d.org/). Once you have it installed, open the command line, navigate to the root of the repository and run the following:
+
+    love .
+
+This should be enough to launch the game. If you get problems when trying to run it, open an issue on GitHub.
+
 ## The h*ck is game even
 
 OpenCrypt is based on an awesome game called [Crypt of the NecroDancer](https://braceyourselfgames.com/crypt-of-the-necrodancer/). It is a roguelike rhythm game where the player explores randomly generated dungeons to progress the protagonists' story.
