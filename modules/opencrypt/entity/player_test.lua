@@ -1,10 +1,15 @@
 local player_test = opencrypt.Creature:newChild()
 local instances = {}
 
+local Camera = opencrypt.Entity:newChild()
+
+function Camera:draw()
+end
+
 function player_test:new(...)
   local p = opencrypt.Creature.new(self, ...)
 
-  p.time = 0
+  p.camera = Camera:new(p.world, p.x,p.y)
 
   setmetatable(p, self.metatable)
   table.insert(instances, p)
@@ -34,7 +39,8 @@ function player_test:isStrong()
 end
 
 function player_test:update(dt, world)
-  self.time = self.time + dt
+  self.camera.x = self.x + (self.camera.x - self.x) * math.pow(0.001, dt)
+  self.camera.y = self.y + (self.camera.y - self.y) * math.pow(0.001, dt)
 end
 
 function player_test:draw(graphics, x,y)

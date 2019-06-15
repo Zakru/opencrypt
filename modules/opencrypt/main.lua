@@ -71,6 +71,7 @@ function opencryptMod:getInitialWorld()
   enemy3:setTarget(player)
   world:spawn(enemy3)
   resources.sound['music_test.str.ogg']:play()
+  world.track = player.camera
   return world
 end
 

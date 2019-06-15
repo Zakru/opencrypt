@@ -33,9 +33,6 @@ function Music:generateBeats(offset, interval, count)
     local pos = offset + (i-1) * interval
     table.insert(self.beats, pos)
   end
-  print(#self.beats)
-  print(self.beats[1])
-  print(self.beats[2])
 end
 
 music = {Music=Music}
