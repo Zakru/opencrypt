@@ -13,7 +13,7 @@ function Music:new(source, beats)
 end
 
 function Music:start()
-  self.source:start()
+  self.source:play()
 end
 
 function Music:stop()
@@ -56,12 +56,16 @@ end
 
 function MusicWorld:begin()
   opencrypt.World.begin(self)
+
+  self.music:start()
 end
 
 function MusicWorld:endWorld()
   if self.music then
     self.music:stop()
   end
+
+  opencrypt.World.endWorld(self)
 end
 
 music = {Music=Music, MusicWorld=MusicWorld}

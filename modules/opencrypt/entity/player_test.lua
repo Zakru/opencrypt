@@ -1,7 +1,8 @@
-local player_test = opencrypt.Creature:newChild()
-player_test.lastBeat = 0
+local entity = require('entity')
+
+local player_test = entity.JumpCreature:newChild()
 player_test.jumpHeight = 0.5
-local instances = {}
+player_test.instances = {}
 
 local Camera = opencrypt.Entity:newChild()
 
@@ -9,14 +10,14 @@ function Camera:draw()
 end
 
 function player_test:new(...)
-  local p = opencrypt.Creature.new(self, ...)
+  local p = entity.JumpCreature.new(self, ...)
 
   p.camera = Camera:new(p.world, p.x,p.y)
-  p.sprite = {x=0,y=0}
   p.flip = false
+  p.lastBeat = 0
 
   setmetatable(p, self.metatable)
-  table.insert(instances, p)
+  table.insert(player_test.instances, p)
   return p
 end
 
@@ -27,17 +28,17 @@ end
 function player_test:setMoveEvent(e, x,y)
   e.addListener(function(pressed)
     if pressed then
-      local progress = player_test.animator.music:progressToNextBeat()
-      local thisBeat = player_test.animator.music.beatIndex
-      if progress < 0.5 then
-        thisBeat = thisBeat - 1
-      end
-      if player_test.lastBeat < thisBeat then
-        for _,p in ipairs(instances) do
-          p:move(x,y)
+      for _,p in ipairs(player_test.instances) do
+        local progress = player_test.animator.music:progressToNextBeat()
+        local thisBeat = player_test.animator.music.beatIndex
+        if progress < 0.5 then
+          thisBeat = thisBeat - 1
         end
-        player_test.stepEvent.call()
-        player_test.lastBeat = thisBeat
+        if p.lastBeat < thisBeat then
+          p:move(x,y)
+          player_test.stepEvent.call()
+          p.lastBeat = thisBeat
+        end
       end
     end
   end)
@@ -56,7 +57,7 @@ function player_test:isStrong()
 end
 
 function player_test:move(x,y)
-  local moved = opencrypt.Creature.move(self, x,y)
+  local moved = entity.JumpCreature.move(self, x,y)
 
   if x ~= 0 then
     self.flip = x < 0
@@ -69,26 +70,18 @@ function player_test:move(x,y)
 end
 
 function player_test:update(dt, world)
+  entity.JumpCreature.update(self, dt, world)
+
   self.camera.x = self.x + (self.camera.x - self.x) * math.pow(0.001, dt)
   self.camera.y = self.y + (self.camera.y - self.y) * math.pow(0.001, dt)
-
-  local maxDist = 8 * dt
-  local dx = math.min(math.max(-self.sprite.x, -maxDist), maxDist)
-  local dy = math.min(math.max(-self.sprite.y, -maxDist), maxDist)
-  self.sprite.x = self.sprite.x + dx
-  self.sprite.y = self.sprite.y + dy
 end
 
-local function jumpHeightAt(d)
-  d = math.max(d, 0)
-  return 4 * (-d*d + d) * player_test.jumpHeight
-end
-
-function player_test:draw(graphics, x,y)
-  local t = self.world.scale
-  local d = math.sqrt(self.sprite.x*self.sprite.x + self.sprite.y*self.sprite.y)
-  if self.animator then
-    self.animator:draw(graphics, 1, x + self.sprite.x * t, y + (self.sprite.y - jumpHeightAt((d))) * t - 9, self.flip)
+function player_test:destroy()
+  for i,inst in ipairs(player_test.instances) do
+    if inst == self then
+      table.remove(player_test.instances, i)
+      return
+    end
   end
 end
 

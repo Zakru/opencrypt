@@ -16,33 +16,40 @@ local Tilemap = require('engine/tilemap')
 local Entity = require('engine/entity')
 local Creature  = require('engine/creature')
 
-local function registerTile(namespace, id, tile)
-  if not modloader.tiles[namespace] then modloader.tiles[namespace] = {} end
-  modloader.tiles[namespace][id] = tile
+local function registerTileFactory(namespace)
+  return function(id, tile)
+    if not modloader.tiles[namespace] then modloader.tiles[namespace] = {} end
+    modloader.tiles[namespace][id] = tile
+  end
 end
 
-local function registerEntity(namespace, id, entity)
-  if not modloader.entities[namespace] then modloader.entities[namespace] = {} end
-  modloader.entities[namespace][id] = entity
+local function registerEntityFactory(namespace)
+  return function(id, entity)
+    if not modloader.entities[namespace] then modloader.entities[namespace] = {} end
+    modloader.entities[namespace][id] = entity
+  end
 end
 
-local function registerObject(namespace, id, object)
-  if not modloader.objects[namespace] then modloader.objects[namespace] = {} end
-  modloader.objects[namespace][id] = object
+local function registerObjectFactory(namespace)
+  return function(id, object)
+    if not modloader.objects[namespace] then modloader.objects[namespace] = {} end
+    modloader.objects[namespace][id] = object
+  end
 end
 
-local function registerGenerator(namespace, id, generator)
-  if not modloader.generators[namespace] then modloader.generators[namespace] = {} end
-  modloader.generators[namespace][id] = generator
+local function registerGeneratorFactory(namespace)
+  return function(id, generator)
+    if not modloader.generators[namespace] then modloader.generators[namespace] = {} end
+    modloader.generators[namespace][id] = generator
+  end
 end
 
-local function registerEventFactory(registered, namespace)
+local function registerEventFactory(namespace)
   return function(id)
     if not modloader.events[namespace] then modloader.events[namespace] = {} end
     local e = {}
     e.listeners = {}
     modloader.events[namespace][id] = e
-    registered.events[id] = e
 
     function e.addListener(listener)
       table.insert(e.listeners, listener)
@@ -58,14 +65,13 @@ local function registerEventFactory(registered, namespace)
   end
 end
 
-local function registerKeybindFactory(registered, namespace)
+local function registerKeybindFactory(namespace)
   return function(id, defaultKey)
     if not modloader.keyevents[namespace] then modloader.keyevents[namespace] = {} end
     local e = {}
     e.listeners = {}
     e.keybind = {key=defaultKey, event=e}
     modloader.keyevents[namespace][id] = e
-    registered.keyevents[id] = e
 
     function e.addListener(listener)
       table.insert(e.listeners, listener)
@@ -78,6 +84,17 @@ local function registerKeybindFactory(registered, namespace)
 end
 
 local function safeCall(modId, func, ...)
+  if arg[2] == '--test' then
+    local status, err, ret xpcall(function()
+      func(unpack(args))
+    end, function(err)
+      print(err)
+    end)
+    if status then
+      return status, err, ret
+    end
+    love.event.quit(1)
+  end
   local args = ... or {}
   return xpcall(function()
     func(unpack(args))
@@ -91,113 +108,48 @@ local function getMod(name)
   return modloader.mods[name]
 end
 
-local function loadGlobals()
-  _G['opencrypt'] = {
-    Tile=Tile,
-    Mod=Mod,
-    World=World,
-    Tilemap=Tilemap,
-    Entity=Entity,
-    Creature=Creature,
-    getMod=getMod,
-  }
+local _require
+local function loadGlobals(prefix)
+  _require = _G.require
+  _G.require = function(path)
+    return _require(prefix .. path)
+  end
 end
 
 local function unloadGlobals()
-  _G['opencrypt'] = nil
-end
-
-function modloader.withGlobals(cb)
-  if not opencrypt then
-    loadGlobals()
-    cb()
-    unloadGlobals()
-  else
-    cb()
+  if _require then
+    _G.require = _require
+    _require = nil
   end
 end
 
 function modloader.load()
   local modDirs = love.filesystem.getDirectoryItems('modules')
 
-  -- Iterate over module directories
+  -- Load modules
   for _,namespace in ipairs(modDirs) do
     local status, _,_ = safeCall(namespace, function()
       local modMain = love.filesystem.getInfo('modules/' .. namespace .. '/main.lua')
 
       -- If the module has a main.lua, require its return value
       if modMain and modMain.type == 'file' then
-        -- Load global variables with the namespace set to the mod's directory
-        loadGlobals()
-        love.graphics.setDefaultFilter('linear', 'nearest')
+        loadGlobals('modules/' .. namespace .. '/')
         -- Require the mod
-        modloader.mods[namespace] = require('modules/' .. namespace .. '/main')
-        for path in iter(modloader.mods[namespace]:getSubmodules()) do
-          modloader.mods[namespace][path] = require('modules/' .. namespace .. '/' .. path)
-          modloader.mods[namespace][path].mod = modloader.mods[namespace]
-        end
+        modloader.mods[namespace] = require('main')
 
-        -- LOAD RESOURCES
-        local registered = {}
-        registered.events = {}
-        registered.keyevents = {}
+        -- PRELOAD MOD
         modloader.mods[namespace]:preLoad({
-          registerEvent=registerEventFactory(registered, namespace),
-          registerKeybind=registerKeybindFactory(registered, namespace),
+          registerEvent=registerEventFactory(namespace),
+          registerKeybind=registerKeybindFactory(namespace),
+          registerTile=registerTileFactory(namespace),
+          registerEntity=registerEntityFactory(namespace),
+          registerObject=registerObjectFactory(namespace),
+          registerGenerator=registerGeneratorFactory(namespace),
         })
-
-        -- Load tiles
-        registered.tiles = {}
-        for _,filename in ipairs(love.filesystem.getDirectoryItems('modules/' .. namespace .. '/tile')) do
-          if filename:match('%.lua$') then
-            tileId = filename:sub(1, -5)
-            local tile = require('modules/' .. namespace .. '/tile/' .. tileId)
-            tile:setTexture(love.graphics.newImage('modules/' .. namespace .. '/tile/' .. tileId .. '.png'))
-            registered.tiles[tileId] = tile
-            registerTile(namespace, tileId, tile)
-          end
-        end
-
-        -- Load entities
-        registered.entities = {}
-        for _,filename in ipairs(love.filesystem.getDirectoryItems('modules/' .. namespace .. '/entity')) do
-          if filename:match('%.lua$') then
-            entityId = filename:sub(1, -5)
-            local entity = require('modules/' .. namespace .. '/entity/' .. entityId)
-            entity.texture = love.graphics.newImage('modules/' .. namespace .. '/entity/' .. entityId .. '.png')
-            registered.entities[entityId] = entity
-            registerEntity(namespace, entityId, entity)
-          end
-        end
-
-        -- Load objects
-        registered.objects = {}
-        for _,filename in ipairs(love.filesystem.getDirectoryItems('modules/' .. namespace .. '/object')) do
-          if filename:match('%.lua$') then
-            objectId = filename:sub(1, -5)
-            local object = require('modules/' .. namespace .. '/object/' .. objectId)
-            entity.texture = love.graphics.newImage('modules/' .. namespace .. '/object/' .. objectId .. '.png')
-            registered.objects[objectId] = object
-            registerEntity(namespace, objectId, object)
-          end
-        end
-
-        -- Load miscellaneous resources
-        resources = {}
-        resources.sound = {}
-        for _,filename in ipairs(love.filesystem.getDirectoryItems('modules/' .. namespace .. '/resource')) do
-          if filename:match('%.ogg$') then
-            local type = 'static'
-            if filename:match('%.str%.ogg$') then type = 'stream' end
-            resources.sound[filename] = love.audio.newSource('modules/' .. namespace .. '/resource/' .. filename, type)
-          end
-        end
 
         modloader.mods[namespace]:load({
           registerEventListener=registerEventListener,
         })
-
-        modloader.mods[namespace]:postLoad(registered, resources)
 
         -- Unload globals
         unloadGlobals()
@@ -208,48 +160,77 @@ function modloader.load()
       print(namespace .. ': An error occurred and this mod was disabled.')
     end
   end
+
+  -- LOAD RESOURCES
+  love.graphics.setDefaultFilter('linear', 'nearest')
+
+  -- Tiles
+  for namespace, tiles in pairs(modloader.tiles) do
+    for id, tile in pairs(tiles) do
+      tile.texture = love.graphics.newImage('modules/' .. namespace .. '/tile/' .. id .. '.png')
+    end
+  end
+
+  -- Entities
+  for namespace, entities in pairs(modloader.entities) do
+    for id, entity in pairs(entities) do
+      entity.texture = love.graphics.newImage('modules/' .. namespace .. '/entity/' .. id .. '.png')
+    end
+  end
+
+  -- Objects
+  for namespace, objects in pairs(modloader.objects) do
+    for id, object in pairs(objects) do
+      object.texture = love.graphics.newImage('modules/' .. namespace .. '/object/' .. id .. '.png')
+    end
+  end
+
+  -- Load miscellaneous resources
+  for namespace, mod in pairs(modloader.mods) do
+    resources = {}
+    resources.sound = {}
+    for _,filename in ipairs(love.filesystem.getDirectoryItems('modules/' .. namespace .. '/resource')) do
+      if filename:match('%.ogg$') then
+        local type = 'static'
+        if filename:match('%.str%.ogg$') then type = 'stream' end
+        resources.sound[filename] = love.audio.newSource('modules/' .. namespace .. '/resource/' .. filename, type)
+      end
+    end
+
+    modloader.mods[namespace]:postLoad(resources)
+  end
 end
 
 function modloader.getInitialWorld()
   for id,mod in pairs(modloader.mods) do
-    loadGlobals()
     local initialWorld = mod:getInitialWorld()
     if initialWorld then
-      unloadGlobals()
       return initialWorld
     end
   end
-
-  unloadGlobals()
   return nil
 end
 
 function modloader.update(dt, world)
   for id,mod in pairs(modloader.mods) do
-    loadGlobals()
     mod:preUpdate(dt, world)
   end
-  loadGlobals()
   if world then
     world:update(dt)
   end
   for id,mod in pairs(modloader.mods) do
-    loadGlobals()
     mod:update(dt, world)
   end
-  unloadGlobals()
 end
 
 function modloader.handleKey(key, pressed)
-  modloader.withGlobals(function()
-    for _,keybind in ipairs(modloader.keybinds) do
-      if keybind.key == key then
-        for l,listener in ipairs(keybind.event.listeners) do
-          listener(pressed)
-        end
+  for _,keybind in ipairs(modloader.keybinds) do
+    if keybind.key == key then
+      for l,listener in ipairs(keybind.event.listeners) do
+        listener(pressed)
       end
     end
-  end)
+  end
 end
 
 return modloader

@@ -1,9 +1,11 @@
-local enemy_test = opencrypt.Creature:newChild(3)
+local entity = require('entity')
+local enemy_test = entity.JumpCreature:newChild(3)
 local instances = {}
+enemy_test.jumpHeight = 0.5
 enemy_test.nextMoveNext = false
 
 function enemy_test:new(...)
-  local e = opencrypt.Creature.new(self, ...)
+  local e = entity.JumpCreature.new(self, ...)
 
   e.moveNext = enemy_test.nextMoveNext
   enemy_test.nextMoveNext = not enemy_test.nextMoveNext
@@ -36,13 +38,13 @@ function enemy_test.directionVector(dir)
 end
 
 function enemy_test:draw(graphics, x,y)
-  opencrypt.Creature.draw(self, graphics, x,y)
+  entity.JumpCreature.draw(self, graphics, x,y)
   graphics.print(tostring(self.health), x+12, y+12)
 end
 
 function enemy_test:move()
   local x,y = enemy_test.directionVector(self.direction)
-  return opencrypt.Creature.move(self, x,y)
+  return entity.JumpCreature.move(self, x,y)
 end
 
 function enemy_test:chooseDirection()
@@ -131,6 +133,15 @@ end
 
 function enemy_test:willAttack(ent)
   return ent == self.target
+end
+
+function enemy_test:destroy()
+  for i,inst in ipairs(instances) do
+    if inst == self then
+      table.remove(instances, i)
+      return
+    end
+  end
 end
 
 return enemy_test

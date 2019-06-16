@@ -49,4 +49,7 @@ end
 function Entity:update(dt)
 end
 
+function Entity:destroy()
+end
+
 return Entity

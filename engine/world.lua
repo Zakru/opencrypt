@@ -9,6 +9,7 @@ function World:new(tilemap, scale)
   w.scale = scale -- Size of one tile
   w.entities = {}
   w.objects = {}
+  w.onEndListeners = {}
 
   setmetatable(w, self.metatable)
   return w
@@ -90,6 +91,19 @@ end
 
 function World:endWorld()
   self.ended = true
+  for e in iter(self.entities) do
+    e:destroy()
+  end
+  for o in iter(self.objects) do
+    o:destroy()
+  end
+  for l,listener in ipairs(self.onEndListeners) do
+    listener(self)
+  end
+end
+
+function World:addOnEndListener(func)
+  table.insert(self.onEndListeners, func)
 end
 
 return World
