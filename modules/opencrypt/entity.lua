@@ -41,13 +41,17 @@ function JumpCreature:update(dt, world)
   self.sprite.y = self.sprite.y + dy
 end
 
-function JumpCreature:draw(graphics, x,y)
-  local t = self.world.scale
+function JumpCreature:getVisualOrigin(graphics)
   local d = math.sqrt(self.sprite.x*self.sprite.x + self.sprite.y*self.sprite.y)
+  return (self.x - 1 + self.sprite.x) * graphics.tileSize, (self.y - 1 + self.sprite.y - self:jumpHeightAt((d))) * graphics.tileSize - 9
+end
+
+function JumpCreature:draw(graphics)
+  local x,y = self:getVisualOrigin(graphics)
   if self.animator then
-    self.animator:draw(graphics, 1, x + self.sprite.x * t, y + (self.sprite.y - self:jumpHeightAt((d))) * t - 9, self.flip)
+    self.animator:draw(graphics, 1, x, y, self.flip)
   else
-    opencrypt.Creature.draw(self, graphics, x,y)
+    opencrypt.Creature.draw(self, graphics)
   end
 end
 

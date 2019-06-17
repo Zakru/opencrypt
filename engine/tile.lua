@@ -20,7 +20,7 @@ end
 
 function Tile:draw(graphics, x,y)
   if self.texture then
-    graphics.draw(self.texture, x,y)
+    graphics.draw(self.texture, x*graphics.tileSize,y*graphics.tileSize)
   end
 end
 

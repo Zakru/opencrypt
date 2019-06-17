@@ -3,7 +3,7 @@ wall_breakable_test.layer = 2
 wall_breakable_test.floorTile = nil
 
 function wall_breakable_test:draw(graphics, x,y)
-  opencrypt.Tile.draw(self, graphics, x,y-15)
+  graphics.draw(self.texture, x*graphics.tileSize,y*graphics.tileSize-15)
 end
 
 function wall_breakable_test:isWalkable()

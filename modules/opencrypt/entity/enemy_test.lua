@@ -37,8 +37,9 @@ function enemy_test.directionVector(dir)
   return 0,0
 end
 
-function enemy_test:draw(graphics, x,y)
-  entity.JumpCreature.draw(self, graphics, x,y)
+function enemy_test:draw(graphics)
+  entity.JumpCreature.draw(self, graphics)
+  local x,y = self:getVisualOrigin(graphics)
   graphics.print(tostring(self.health), x+12, y+12)
 end
 

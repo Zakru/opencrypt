@@ -16,7 +16,12 @@ function Entity:newChild()
   return child
 end
 
-function Entity:draw(graphics, x,y)
+function Entity:getVisualOrigin(graphics)
+  return (self.x-1) * graphics.tileSize, (self.y-1) * graphics.tileSize
+end
+
+function Entity:draw(graphics)
+  local x,y = self:getVisualOrigin(graphics)
   if self.texture then
     graphics.draw(self.texture, x,y)
   end

@@ -12,6 +12,38 @@ function RenderEngine.new()
   return re
 end
 
+local function wrappedGraphics(xoff,yoff, tileSize)
+  local wg = {}
+  wg.tileSize = tileSize
+
+  local function draw(drawable, x, y, r, sx, sy, ox, oy, kx, ky)
+    x = xoff + x
+    y = yoff + y
+    love.graphics.draw(drawable, x, y, r, sx, sy, ox, oy, kx, ky)
+  end
+
+  local function drawQuad(texture, quad, x, y, r, sx, sy, ox, oy, kx, ky)
+    x = xoff + x
+    y = yoff + y
+    love.graphics.draw(texture, quad, x, y, r, sx, sy, ox, oy, kx, ky)
+  end
+
+  function wg.draw(...)
+    if type(({...})[2]) == 'number' then
+      return draw(...)
+    end
+    return drawQuad(...)
+  end
+
+  function wg.print(text, x, y, r, sx, sy, ox, oy, kx, ky)
+    x = xoff + x
+    y = yoff + y
+    return love.graphics.print(text, x, y, r, sx, sy, ox, oy, kx, ky)
+  end
+
+  return wg
+end
+
 function RenderEngine:render()
   if #self.uiRenderers == 0 and self.world == nil then
     -- Nothing to render
@@ -32,7 +64,7 @@ function RenderEngine:render()
     self.world:forTileRows(function(row, y)
       self.world:forTilesInRow(row, function(tile, x)
         if tile.layer == 1 then
-          tile:draw(love.graphics, xoff+(x-1)*self.world.scale, yoff+(y-1)*self.world.scale)
+          tile:draw(wrappedGraphics(xoff,yoff, self.world.scale), x-1, y-1)
         end
       end)
     end)
@@ -41,12 +73,12 @@ function RenderEngine:render()
     self.world:forTileRows(function(row, y)
       self.world:forTilesInRow(row, function(tile, x)
         if tile.layer == 2 then
-          tile:draw(love.graphics, xoff+(x-1)*self.world.scale, yoff+(y-1)*self.world.scale)
+          tile:draw(wrappedGraphics(xoff,yoff, self.world.scale), x-1, y-1)
         end
       end)
 
       self.world:forEntitiesOnRow(y, function(ent)
-        ent:draw(love.graphics, xoff+(ent.x-1)*self.world.scale, yoff+(ent.y-1)*self.world.scale)
+        ent:draw(wrappedGraphics(xoff,yoff, self.world.scale))
       end)
     end)
 
@@ -54,7 +86,7 @@ function RenderEngine:render()
     self.world:forTileRows(function(row, y)
       self.world:forTilesInRow(row, function(tile, x)
         if tile.layer == 3 then
-          tile:draw(love.graphics, xoff+(x-1)*self.world.scale, yoff+(y-1)*self.world.scale)
+          tile:draw(wrappedGraphics(xoff,yoff, self.world.scale), x-1, y-1)
         end
       end)
     end)
