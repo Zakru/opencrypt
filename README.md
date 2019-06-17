@@ -2,11 +2,11 @@
 
 (the game)
 
-[Discord](https://discord.gg/Fx4g3hE)
+[Discord](https://discord.gg/Fx4g3hE) [Wiki](https://github.com/Zakru/opencrypt/wiki)
 
 A LÖVE2D powered open source game based on Crypt of the NecroDancer
 
-Disclaimer: This project was not made to re-create CotND, but to create a new, highly customizable community-run game. Zakru or any other OpenCrypt repository admin is not responsible for – and we fact discourage – any external mods for the game which may contain copyright infringing content.
+Disclaimer: This project was not made to re-create CotND, but to create a new, highly customizable community-run game. Zakru or any other OpenCrypt repository admin is not responsible for – and we in fact discourage – any external mods for the game which may contain copyright infringing content.
 
 A tool may be created in the future which allows for copying the contents of a legitimate copy of CotND into a format compatible with OpenCrypt, but which will not distribute the content.
 
@@ -28,4 +28,4 @@ OpenCrypt revolves around a similar mechanic – rhythm-based exploration of are
 
 ## But if it's free, it's bad
 
-If you find a bug, a lack of a feature, or just think an existing feature is bad, you can do something about it! Open an issue, or fix it yourself and open a pull request! OpenCrypt is completely open source and everyone can edit it. This also brings safety to it, as everyone can check the source code to make sure nothing bad is trying to lurk in.
+If you find a bug, a lack of a feature, or just think an existing feature is bad, you can do something about it! Open an issue, or fix it yourself and open a pull request! OpenCrypt is completely open source and everyone can edit it. This also brings safety to it, as everyone can check the source code to make sure nothing bad is trying to lurk in. Be sure to check out our contribution guidelines [here](https://github.com/Zakru/opencrypt/wiki/Contribution-guidelines).
