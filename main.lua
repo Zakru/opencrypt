@@ -53,6 +53,7 @@ end
 
 function love.draw()
   process.renderer:render()
+  modloader.draw()
 end
 
 function love.keypressed(key, _, isrepeat)

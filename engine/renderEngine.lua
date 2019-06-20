@@ -44,10 +44,6 @@ local function wrappedGraphics(xoff,yoff, tileSize)
   return wg
 end
 
-function RenderEngine:addUIRender(r)
-  table.insert(self.uiRenderers, r)
-end
-
 function RenderEngine:render()
   if #self.uiRenderers == 0 and self.world == nil then
     -- Nothing to render
@@ -94,10 +90,6 @@ function RenderEngine:render()
         end
       end)
     end)
-  end
-
-  for r,renderer in ipairs(self.uiRenderers) do
-    renderer.render(love.graphics)
   end
 end
 

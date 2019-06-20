@@ -27,4 +27,7 @@ end
 function Mod:update(dt, world)
 end
 
+function Mod:draw()
+end
+
 return Mod

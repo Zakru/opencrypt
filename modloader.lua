@@ -20,6 +20,8 @@ local function registerTileFactory(namespace)
   return function(id, tile)
     if not modloader.tiles[namespace] then modloader.tiles[namespace] = {} end
     modloader.tiles[namespace][id] = tile
+    tile.registeredNamespace = namespace
+    tile.registeredId = id
   end
 end
 
@@ -27,6 +29,8 @@ local function registerEntityFactory(namespace)
   return function(id, entity)
     if not modloader.entities[namespace] then modloader.entities[namespace] = {} end
     modloader.entities[namespace][id] = entity
+    entity.registeredNamespace = namespace
+    entity.registeredId = id
   end
 end
 
@@ -34,6 +38,8 @@ local function registerObjectFactory(namespace)
   return function(id, object)
     if not modloader.objects[namespace] then modloader.objects[namespace] = {} end
     modloader.objects[namespace][id] = object
+    object.registeredNamespace = namespace
+    object.registeredId = id
   end
 end
 
@@ -220,6 +226,12 @@ function modloader.update(dt, world)
   end
   for id,mod in pairs(modloader.mods) do
     mod:update(dt, world)
+  end
+end
+
+function modloader.draw()
+  for id,mod in pairs(modloader.mods) do
+    mod:draw()
   end
 end
 

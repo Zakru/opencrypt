@@ -29,15 +29,17 @@ function player_test:setMoveEvent(e, x,y)
   e.addListener(function(pressed)
     if pressed then
       for _,p in ipairs(player_test.instances) do
-        local progress = player_test.animator.music:progressToNextBeat()
-        local thisBeat = player_test.animator.music.beatIndex
-        if progress < 0.5 then
-          thisBeat = thisBeat - 1
-        end
-        if p.lastBeat < thisBeat then
-          p:move(x,y)
-          player_test.stepEvent.call()
-          p.lastBeat = thisBeat
+        if not p.world.stop then
+          local progress = player_test.animator.music:progressToNextBeat()
+          local thisBeat = player_test.animator.music.beatIndex
+          if progress < 0.5 then
+            thisBeat = thisBeat - 1
+          end
+          if p.lastBeat < thisBeat then
+            p:move(x,y)
+            player_test.stepEvent.call()
+            p.lastBeat = thisBeat
+          end
         end
       end
     end

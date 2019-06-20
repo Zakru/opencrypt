@@ -16,6 +16,12 @@ local stairs_down
 local player_test
 local enemy_test
 
+local fadeDirection = 0
+local fade = 0
+local fading = false
+
+local world
+
 function opencryptMod:preLoad(registry)
   animators = require('animators')
   music = require('music')
@@ -52,12 +58,18 @@ function opencryptMod:postLoad(resources)
 
   wall_breakable_test.floorTile = floor_test
 
+  stairs_down.playerMeta = player_test.metatable
+  function stairs_down:onEnter()
+    fadeDirection = 1
+    fading = true
+    world.stop = true
+  end
+
   player_test:setMoveEvent(self.rightEvent, 1, 0)
   player_test:setMoveEvent(self.leftEvent, -1, 0)
   player_test:setMoveEvent(self.downEvent,  0, 1)
   player_test:setMoveEvent(self.upEvent,    0,-1)
   player_test:setStepEvent(self.stepEvent)
-
 
   mus = music.Music:new(resources.sound['music_test.str.ogg'])
   mus:generateBeats(0, 0.5, 128)
@@ -84,7 +96,7 @@ function worldGenerator:nextWorld()
     end
   end
   t:setTileAt(10,4, stairs_down)
-  local world = music.MusicWorld:new(mus, t, 24)
+  world = music.MusicWorld:new(mus, t, 24)
   local player = player_test:new(world, 4,4)
   world:spawn(player)
   local enemy1 = enemy_test:new(world, 9,3)
@@ -110,7 +122,7 @@ function opencryptMod:getInitialWorld()
     end
   end
   t:setTileAt(4,5, stairs_down)
-  local world = music.MusicWorld:new(mus, t, 24)
+  world = music.MusicWorld:new(mus, t, 24)
   local player = player_test:new(world, 4,3)
   world:spawn(player)
   world.track = player.camera
@@ -120,20 +132,42 @@ function opencryptMod:getInitialWorld()
 end
 
 function opencryptMod:update(dt, world)
-  for player in iter(player_test.instances) do
-    local progress = player.animator.music:progressToNextBeat()
-    local thisBeat = player.animator.music.beatIndex
-    if progress < 0.5 then
-      thisBeat = thisBeat - 1
-    end
-    if player.lastBeat < thisBeat - 1 then
-      self.stepEvent.call()
-      player.lastBeat = thisBeat - 1
-      break
-    else
-      player.canDoStep = player.lastBeat < thisBeat
+  if not fading then
+    for player in iter(player_test.instances) do
+      local progress = player.animator.music:progressToNextBeat()
+      local thisBeat = player.animator.music.beatIndex
+      if progress < 0.5 then
+        thisBeat = thisBeat - 1
+      end
+      if player.lastBeat < thisBeat - 1 then
+        self.stepEvent.call()
+        player.lastBeat = thisBeat - 1
+        break
+      else
+        player.canDoStep = player.lastBeat < thisBeat
+      end
     end
   end
+
+  if fadeDirection > 0 then
+    mus.source:setVolume(1-fade)
+  else
+    mus.source:setVolume(1)
+  end
+
+  if fade == 1 and fadeDirection > 0 then
+    fadeDirection = -1
+    fading = false
+    world:endWorld()
+  end
+
+  fade = math.max(math.min(fade + fadeDirection * dt * 2, 1), 0)
+end
+
+function opencryptMod:draw()
+  love.graphics.setColor(0,0,0, fade)
+  love.graphics.rectangle('fill', 0,0, love.graphics.getDimensions())
+  love.graphics.setColor(1,1,1)
 end
 
 return opencryptMod
