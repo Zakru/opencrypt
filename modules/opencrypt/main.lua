@@ -1,3 +1,6 @@
+local WallTile = require('tile/wallTile')
+local Tile = opencrypt.Tile
+
 local opencryptMod = opencrypt.Mod.new()
 
 local animators
@@ -5,6 +8,7 @@ local music
 local mus
 
 local wall_test
+local wall_brick
 local floor_test
 local wall_breakable_test
 local stairs_down
@@ -23,10 +27,14 @@ function opencryptMod:preLoad(registry)
   self.downEvent = registry.registerKeybind('down', 'down')
   self.upEvent = registry.registerKeybind('up', 'up')
 
-  wall_test = require('tile/wall_test')
+  wall_test = WallTile:new()
   registry.registerTile('wall_test', wall_test)
-  floor_test = require('tile/floor_test')
+  wall_brick = WallTile:new()
+  registry.registerTile('wall_brick', wall_brick)
+  floor_test = Tile:new()
   registry.registerTile('floor_test', floor_test)
+  floor_brick = Tile:new()
+  registry.registerTile('floor_brick', floor_brick)
   wall_breakable_test = require('tile/wall_breakable_test')
   registry.registerTile('wall_breakable_test', wall_breakable_test)
   stairs_down = require('tile/stairs_down')
@@ -69,9 +77,9 @@ function worldGenerator:nextWorld()
   for x=1,12 do
     for y=1,7 do
       if x == 1 or x == 12 or y == 1 or y == 7 then
-        t:setTileAt(x,y, wall_test)
+        t:setTileAt(x,y, wall_brick)
       else
-        t:setTileAt(x,y, floor_test)
+        t:setTileAt(x,y, floor_brick)
       end
     end
   end

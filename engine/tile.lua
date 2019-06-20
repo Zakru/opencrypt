@@ -10,6 +10,14 @@ function Tile:new()
   return t
 end
 
+function Tile:newChild()
+  local child = {}
+  child.metatable = {__index = child}
+
+  setmetatable(child, self.metatable)
+  return child
+end
+
 function Tile:setTexture(texture)
   self.texture = texture
 end

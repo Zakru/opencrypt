@@ -44,6 +44,10 @@ local function wrappedGraphics(xoff,yoff, tileSize)
   return wg
 end
 
+function RenderEngine:addUIRender(r)
+  table.insert(self.uiRenderers, r)
+end
+
 function RenderEngine:render()
   if #self.uiRenderers == 0 and self.world == nil then
     -- Nothing to render
