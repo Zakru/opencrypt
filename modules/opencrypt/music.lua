@@ -1,10 +1,10 @@
 local Music = {}
 Music.metatable = {__index = Music}
 
-function Music:new(source, beats)
+function Music:new(audio, beats)
   local m = {}
 
-  m.source = source
+  m.audio = audio
   m.beatIndex = 1
   m.beats = beats or {}
 
@@ -13,11 +13,18 @@ function Music:new(source, beats)
 end
 
 function Music:start()
-  self.source:play()
+  if self.instance then
+    self.instance:stop()
+    self.instance:release()
+  end
+  self.instance = self.audio:getInstance()
+  self.instance:play()
 end
 
 function Music:stop()
-  self.source:stop()
+  if self.instance then
+    self.instance:stop()
+  end
   self.beatIndex = 1
 end
 
@@ -28,7 +35,7 @@ function Music:progressToNextBeat()
 
   local previous = self.beats[self.beatIndex-1] or 0
   local next = self.beats[self.beatIndex]
-  local timeToNext = next - self.source:tell()
+  local timeToNext = next - self.instance:tell()
   if timeToNext <= 0 then
     self.beatIndex = self.beatIndex + 1
     return self:progressToNextBeat()

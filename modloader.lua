@@ -14,7 +14,8 @@ local Mod = require('engine/mod')
 local World = require('engine/world')
 local Tilemap = require('engine/tilemap')
 local Entity = require('engine/entity')
-local Creature  = require('engine/creature')
+local Creature = require('engine/creature')
+local Resource = require('engine/resource')
 
 local function registerTileFactory(namespace)
   return function(id, tile)
@@ -153,10 +154,6 @@ function modloader.load()
           registerGenerator=registerGeneratorFactory(namespace),
         })
 
-        modloader.mods[namespace]:load({
-          registerEventListener=registerEventListener,
-        })
-
         -- Unload globals
         unloadGlobals()
       end
@@ -165,6 +162,12 @@ function modloader.load()
     if not status then
       print(namespace .. ': An error occurred and this mod was disabled.')
     end
+  end
+
+  for _,namespace in ipairs(modloader.mods) do
+    modloader.mods[namespace]:load({
+      registerEventListener=registerEventListener,
+    })
   end
 
   -- LOAD RESOURCES
@@ -193,14 +196,9 @@ function modloader.load()
 
   -- Load miscellaneous resources
   for namespace, mod in pairs(modloader.mods) do
-    resources = {}
-    resources.sound = {}
+    local resources = {}
     for _,filename in ipairs(love.filesystem.getDirectoryItems('modules/' .. namespace .. '/resource')) do
-      if filename:match('%.ogg$') then
-        local type = 'static'
-        if filename:match('%.str%.ogg$') then type = 'stream' end
-        resources.sound[filename] = love.audio.newSource('modules/' .. namespace .. '/resource/' .. filename, type)
-      end
+      resources[filename] = Resource:new('modules/' .. namespace .. '/resource/' .. filename)
     end
 
     modloader.mods[namespace]:postLoad(resources)

@@ -53,7 +53,6 @@ function opencryptMod:preLoad(registry)
 end
 
 function opencryptMod:postLoad(resources)
-  self.registered = registered
   self.resources = resources
 
   wall_breakable_test.floorTile = floor_test
@@ -71,7 +70,7 @@ function opencryptMod:postLoad(resources)
   player_test:setMoveEvent(self.upEvent,    0,-1)
   player_test:setStepEvent(self.stepEvent)
 
-  mus = music.Music:new(resources.sound['music_test.str.ogg'])
+  mus = music.Music:new(resources['music_test.str.ogg'])
   mus:generateBeats(0, 0.5, 128)
   player_test:setAnimator(animators.MusicAnimator:new(mus, 1,4, player_test))
 
@@ -150,9 +149,9 @@ function opencryptMod:update(dt, world)
   end
 
   if fadeDirection > 0 then
-    mus.source:setVolume(1-fade)
+    mus.instance:setVolume(1-fade)
   else
-    mus.source:setVolume(1)
+    mus.instance:setVolume(1)
   end
 
   if fade == 1 and fadeDirection > 0 then
