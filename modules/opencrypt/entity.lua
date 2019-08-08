@@ -1,4 +1,20 @@
-local JumpCreature = opencrypt.Creature:newChild()
+-- StepCreature
+
+local StepCreature = opencrypt.Creature:newChild()
+
+function StepCreature:callStep(world)
+  if not self.stepCalled then
+    self.stepCalled = true
+    self:step(world)
+  end
+end
+
+function StepCreature:step(world)
+end
+
+-- JumpCreature
+
+local JumpCreature = StepCreature:newChild()
 JumpCreature.jumpHeight = 0.5
 
 function JumpCreature:new(...)
@@ -55,5 +71,5 @@ function JumpCreature:draw(graphics)
   end
 end
 
-local entity = {JumpCreature = JumpCreature}
+local entity = {StepCreature = StepCreature, JumpCreature = JumpCreature}
 return entity

@@ -1,8 +1,10 @@
 local entity = require('entity')
+local music = require('music')
 
 local player_test = entity.JumpCreature:newChild()
 player_test.jumpHeight = 0.5
-player_test.instances = {}
+player_test.shouldMove = false
+player_test.nextMove = {0,0}
 
 local Camera = opencrypt.Entity:newChild()
 
@@ -17,7 +19,6 @@ function player_test:new(...)
   p.lastBeat = 0
 
   setmetatable(p, self.metatable)
-  table.insert(player_test.instances, p)
   return p
 end
 
@@ -28,26 +29,10 @@ end
 function player_test:setMoveEvent(e, x,y)
   e.addListener(function(pressed)
     if pressed then
-      for _,p in ipairs(player_test.instances) do
-        if not p.world.stop then
-          local progress = player_test.animator.music:progressToNextBeat()
-          local thisBeat = player_test.animator.music.beatIndex
-          if progress < 0.5 then
-            thisBeat = thisBeat - 1
-          end
-          if p.lastBeat < thisBeat then
-            p:move(x,y)
-            player_test.stepEvent.call()
-            p.lastBeat = thisBeat
-          end
-        end
-      end
+      player_test.shouldMove = true
+      player_test.nextMove = {x,y}
     end
   end)
-end
-
-function player_test:setStepEvent(e)
-  self.stepEvent = e
 end
 
 function player_test:getDamage()
@@ -72,19 +57,28 @@ function player_test:move(x,y)
 end
 
 function player_test:update(dt, world)
+  if player_test.shouldMove then
+    player_test.shouldMove = false
+    if not self.world.stop then
+      local progress = self.animator.music:progressToNextBeat()
+      local thisBeat = self.animator.music.beatIndex
+      if progress < 0.5 then
+        thisBeat = thisBeat - 1
+      end
+      if self.lastBeat < thisBeat then
+        self:move(player_test.nextMove[1], player_test.nextMove[2])
+        self.lastBeat = thisBeat
+        if self.world:instanceOf(music.MusicWorld) then
+          self.world:step()
+        end
+      end
+    end
+  end
+
   entity.JumpCreature.update(self, dt, world)
 
   self.camera.x = self.x + (self.camera.x - self.x) * math.pow(0.001, dt)
   self.camera.y = self.y + (self.camera.y - self.y) * math.pow(0.001, dt)
-end
-
-function player_test:destroy()
-  for i,inst in ipairs(player_test.instances) do
-    if inst == self then
-      table.remove(player_test.instances, i)
-      return
-    end
-  end
 end
 
 return player_test

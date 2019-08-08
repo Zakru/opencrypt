@@ -16,14 +16,6 @@ function enemy_test:new(...)
   return e
 end
 
-function enemy_test.giveStepEvent(event)
-  event.addListener(function ()
-    for _,e in ipairs(instances) do
-      e:ai()
-    end
-  end)
-end
-
 function enemy_test.directionVector(dir)
   if dir == 'right' then
     return 1,0
@@ -48,14 +40,14 @@ function enemy_test:move()
   return entity.JumpCreature.move(self, x,y)
 end
 
-function enemy_test:chooseDirection()
+function enemy_test:chooseDirection(disregardEntities)
   if self.target then
     local xDiff = self.target.x - self.x
     local yDiff = self.target.y - self.y
     
     function walkable(x,y)
       local tile = self.world.tilemap:getTileAt(self.x + x, self.y + y)
-      local e = table.all(self.world:getEntitiesAt(self.x + x, self.y + y), function(v)
+      local e = disregardEntities or table.all(self.world:getEntitiesAt(self.x + x, self.y + y), function(v)
         return v == self.target or v:isWalkable()
       end)
       return tile and tile:isWalkable() and e
@@ -113,13 +105,24 @@ function enemy_test:chooseDirection()
   end
 end
 
-function enemy_test:ai()
-  self:chooseDirection()
+function enemy_test:step(world)
   if self.moveNext then
+    local x,y = enemy_test.directionVector(self.direction)
+    local e = self.world:getFirstEntityAt(self.x + x, self.y + y)
+    if e and not e:isWalkable() then
+      e:callStep(world)
+      local e = self.world:getFirstEntityAt(self.x + x, self.y + y)
+      if e and not e:isWalkable() then
+        self:chooseDirection(false)
+      end
+    else
+      self:chooseDirection(true)
+    end
     if self:move() then
       self.moveNext = false
     end
   else
+    self:chooseDirection(true)
     self.moveNext = true
   end
 end

@@ -34,3 +34,13 @@ function table.all(t, func)
   end
   return true
 end
+
+function table.filter(t, func)
+  local t2 = {}
+  for i=1,#t do
+    if func(t[i]) then
+      table.insert(t2, t[i])
+    end
+  end
+  return t2
+end

@@ -75,5 +75,46 @@ function MusicWorld:endWorld()
   opencrypt.World.endWorld(self)
 end
 
-music = {Music=Music, MusicWorld=MusicWorld}
-return music
+function MusicWorld:playerFilter()
+  return function(e)
+    e:instanceOf(self.playerType)
+  end
+end
+
+function MusicWorld:update(dt)
+  opencrypt.World.update(self, dt)
+  
+  if not self.freeze then
+    -- Check if a player entity has missed a beat.
+    for player in iter(table.filter(self.entities, self:playerFilter())) do
+      local progress = player.animator.music:progressToNextBeat()
+      local thisBeat = player.animator.music.beatIndex
+      if progress < 0.5 then
+        thisBeat = thisBeat - 1
+      end
+      if player.lastBeat < thisBeat - 1 then
+        self:step()
+        player.lastBeat = thisBeat - 1
+        break
+      else
+        player.canDoStep = player.lastBeat < thisBeat
+      end
+    end
+  end
+end
+
+function MusicWorld:step()
+  for e in iter(self.entities) do
+    if e:instanceOf(entity.StepCreature) then
+      e.stepCalled = false
+    end
+  end
+
+  for e in iter(self.entities) do
+    if e:instanceOf(entity.StepCreature) then
+      e:callStep()
+    end
+  end
+end
+
+return {Music=Music, MusicWorld=MusicWorld}

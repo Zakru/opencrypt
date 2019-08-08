@@ -37,7 +37,6 @@ function opencryptMod:preLoad(registry)
   music = require('music')
 
   -- Register events
-  self.stepEvent = registry.registerEvent('step')
 
   -- Register keybinds with their default keys. Default keys will be
   -- overridden with configuration.
@@ -67,6 +66,8 @@ function opencryptMod:preLoad(registry)
   registry.registerEntity('player_test', player_test)
   enemy_test = require('entity/enemy_test')
   registry.registerEntity('enemy_test', enemy_test)
+
+  music.MusicWorld.playerType = player_test
 end
 
 -- Placeholder for now. Register event listeners here. This function is
@@ -101,8 +102,6 @@ function opencryptMod:postLoad(resources)
   player_test:setMoveEvent(self.leftEvent, -1, 0)
   player_test:setMoveEvent(self.downEvent,  0, 1)
   player_test:setMoveEvent(self.upEvent,    0,-1)
-  -- Add step skip handler to player_test
-  player_test:setStepEvent(self.stepEvent)
 
   -- Create a Music instance from the test music
   mus = music.Music:new(resources['music_test.str.ogg'])
@@ -112,9 +111,6 @@ function opencryptMod:postLoad(resources)
   mus:generateBeats(0, 0.5, 128)
   -- Set player_test's animation to follow the music's beats
   player_test:setAnimator(animators.MusicAnimator:new(mus, 1,4, player_test))
-
-  -- Give enemy_test the step event for listening
-  enemy_test.giveStepEvent(self.stepEvent)
 end
 
 -- Called when a world this handler is assigned to ends
@@ -190,25 +186,7 @@ end
 
 -- Called every frame with the delta time and active world
 function opencryptMod:update(dt, world)
-  -- If not fading out...
-  if not fading then
-    -- ...check if any player has missed a beat.
-    -- Should be refactored.
-    for player in iter(player_test.instances) do
-      local progress = player.animator.music:progressToNextBeat()
-      local thisBeat = player.animator.music.beatIndex
-      if progress < 0.5 then
-        thisBeat = thisBeat - 1
-      end
-      if player.lastBeat < thisBeat - 1 then
-        self.stepEvent.call()
-        player.lastBeat = thisBeat - 1
-        break
-      else
-        player.canDoStep = player.lastBeat < thisBeat
-      end
-    end
-  end
+  world.freeze = fading
 
   -- If fading out, set music volume to amount of visibility
   if fadeDirection > 0 then
