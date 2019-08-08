@@ -1,6 +1,5 @@
 local Entity = require('engine/entity')
 local Creature = Entity:newChild()
-Creature.metatable = {__index = Creature}
 Creature.maxHealth = 1
 
 function Creature:new(...)
@@ -8,7 +7,6 @@ function Creature:new(...)
 
   e.health = self.maxHealth
 
-  setmetatable(e, self.metatable)
   return e
 end
 

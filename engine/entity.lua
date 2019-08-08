@@ -1,19 +1,14 @@
-local Entity = {}
-Entity.metatable = {__index = Entity}
+local Type = require('engine/type')
+local Entity = Type:newChild()
 
 function Entity:new(world, x,y)
-  local e = {world=world, x=x,y=y}
+  local e = Type.new(self)
 
-  setmetatable(e, self.metatable)
+  e.world = world
+  e.x = x
+  e.y = y
+
   return e
-end
-
-function Entity:newChild()
-  local child = {}
-  child.metatable = {__index = child}
-
-  setmetatable(child, self.metatable)
-  return child
 end
 
 function Entity:getVisualOrigin(graphics)

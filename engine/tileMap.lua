@@ -1,8 +1,8 @@
 local Tile = require('engine/tile')
+local Type = require('engine/type')
 
 -- A Tilemap contains a palette of tiles and a 2D-table of numbers corresponding to the tiles in the palette
-local Tilemap = {}
-Tilemap.metatable = {__index = Tilemap}
+local Tilemap = Type:newChild()
 
 local emptyTile = Tile:new()
 function emptyTile:isWalkable()
@@ -10,7 +10,7 @@ function emptyTile:isWalkable()
 end
 
 function Tilemap:new(w,h)
-  local t = {}
+  local t = Type.new(self)
 
   t.width=w
   t.height=h
@@ -25,7 +25,6 @@ function Tilemap:new(w,h)
     end
   end
 
-  setmetatable(t, self.metatable)
   return t
 end
 

@@ -1,22 +1,8 @@
+local Type = require('engine/type')
+
 -- A Tile is a static object in the world, which can be used in a Tilemap
-local Tile = {}
-Tile.metatable = {__index = Tile}
+local Tile = Type:newChild()
 Tile.layer = 1
-
-function Tile:new()
-  local t = {}
-
-  setmetatable(t, self.metatable)
-  return t
-end
-
-function Tile:newChild()
-  local child = {}
-  child.metatable = {__index = child}
-
-  setmetatable(child, self.metatable)
-  return child
-end
 
 function Tile:setTexture(texture)
   self.texture = texture

@@ -1,14 +1,14 @@
-local Music = {}
-Music.metatable = {__index = Music}
+local entity = require('entity')
+
+local Music = opencrypt.Type:newChild()
 
 function Music:new(audio, beats)
-  local m = {}
+  local m = opencrypt.Type.new(self)
 
   m.audio = audio
   m.beatIndex = 1
   m.beats = beats or {}
 
-  setmetatable(m, self.metatable)
   return m
 end
 

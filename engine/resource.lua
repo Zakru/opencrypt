@@ -1,13 +1,13 @@
-local Resource = {}
-Resource.metatable = {__index = Resource}
+local Type = require('engine/type')
+
+local Resource = Type:newChild()
 
 function Resource:new(path)
-  local r = {}
+  local r = Type.new(self)
 
   r.path = path
   r.type = self:getType(path)
 
-  setmetatable(r, self.metatable)
   return r
 end
 

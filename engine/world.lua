@@ -1,9 +1,10 @@
+local Type = require('engine/type')
+
 -- A world is a combination of a Tilemap, entities and objects.
-local World = {}
-World.metatable = {__index = World}
+local World = Type:newChild()
 
 function World:new(tilemap, scale)
-  local w = {}
+  local w = Type.new(self)
 
   w.tilemap = tilemap
   w.scale = scale -- Size of one tile
@@ -11,16 +12,7 @@ function World:new(tilemap, scale)
   w.objects = {}
   w.onEndListeners = {}
 
-  setmetatable(w, self.metatable)
   return w
-end
-
-function World:newChild()
-  local child = {}
-  child.metatable = {__index = child}
-
-  setmetatable(child, self.metatable)
-  return child
 end
 
 function World:begin()

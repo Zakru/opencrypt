@@ -5,6 +5,7 @@ require('util')
 local process = {}
 
 _G.opencrypt = {
+  Type = require('engine/type'),
   Tile = require('engine/tile'),
   Mod = require('engine/mod'),
   World = require('engine/world'),

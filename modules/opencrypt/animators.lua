@@ -1,8 +1,7 @@
-local Animator = {}
-Animator.metatable = {__index = Animator}
+local Animator = opencrypt.Type:newChild()
 
 function Animator:new(tracks, frames, ent)
-  local a = {}
+  local a = opencrypt.Type.new(self)
 
   a.tracks = tracks
   a.frames = frames
@@ -20,16 +19,7 @@ function Animator:new(tracks, frames, ent)
     end
   end
 
-  setmetatable(a, self.metatable)
   return a
-end
-
-function Animator:newChild()
-  local child = {}
-  child.metatable = {__index = child}
-
-  setmetatable(child, self.metatable)
-  return child
 end
 
 function Animator:draw(graphics, track, progress, x,y, flip)
