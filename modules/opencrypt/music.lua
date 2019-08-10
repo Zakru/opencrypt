@@ -77,7 +77,7 @@ end
 
 function MusicWorld:playerFilter()
   return function(e)
-    e:instanceOf(self.playerType)
+    return e:instanceOf(self.playerType)
   end
 end
 
