@@ -11,6 +11,7 @@ local opencryptMod = opencrypt.Mod.new()
 
 local animators
 local music
+local worldGenerator
 local mus
 
 local wall_test
@@ -35,6 +36,7 @@ function opencryptMod:preLoad(registry)
   -- functions.
   animators = require('animators')
   music = require('music')
+  worldGenerator = require('worldGenerator')
 
   -- Register events
 
@@ -68,6 +70,9 @@ function opencryptMod:preLoad(registry)
   registry.registerEntity('enemy_test', enemy_test)
 
   music.MusicWorld.playerType = player_test
+  worldGenerator.floor = floor_brick
+  worldGenerator.wall = wall_brick
+  worldGenerator.player = player_test
 end
 
 -- Placeholder for now. Register event listeners here. This function is
@@ -105,6 +110,7 @@ function opencryptMod:postLoad(resources)
 
   -- Create a Music instance from the test music
   mus = music.Music:new(resources['music_test.str.ogg'])
+  worldGenerator.music = mus
   -- Generate the beats for the music (just generates beats with a start
   -- time, interval and count, doesn't actually automatically generate
   -- the beats from the music)
@@ -117,47 +123,6 @@ end
 local function onWorldEnd(world)
   -- Reset player_test's last beat
   player_test.lastBeat = 0
-end
-
--- Prepare the world generator
-local worldGenerator = {}
-
--- Generate the next world from this generator
-function worldGenerator:nextWorld()
-  -- Create a tilemap
-  local t = opencrypt.Tilemap:new(12, 7)
-
-  -- Fill the tilemap
-  for x=1,12 do
-    for y=1,7 do
-      if x == 1 or x == 12 or y == 1 or y == 7 then
-        t:setTileAt(x,y, wall_brick)
-      else
-        t:setTileAt(x,y, floor_brick)
-      end
-    end
-  end
-  t:setTileAt(10,4, stairs_down)
-  world = music.MusicWorld:new(mus, t, 24)
-
-  -- Spawn player
-  local player = player_test:new(world, 4,4)
-  world:spawn(player)
-
-  -- Create enemies targeting the player and spawn them
-  local enemy1 = enemy_test:new(world, 9,3)
-  enemy1:setTarget(player)
-  world:spawn(enemy1)
-  local enemy2 = enemy_test:new(world, 9,5)
-  enemy2:setTarget(player)
-  world:spawn(enemy2)
-
-  -- Set the world to track the player's camera entity
-  world.track = player.camera
-
-  -- Set the world's end listener to the function defined above
-  world:addOnEndListener(onWorldEnd)
-  return world
 end
 
 -- Called when the engine is requesting a lobby/menu world. Should
