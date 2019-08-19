@@ -1,10 +1,4 @@
-music = require('music')
-local clock = os.clock
-function sleep(n)  -- seconds
-  local t0 = clock()
-  while clock() - t0 <= n do end
-end
-math.randomseed(os.time()); math.random(); math.random(); math.random();
+local music = require('music')
 
 -- Called when a world this handler is assigned to ends
 local function onWorldEnd(world)
