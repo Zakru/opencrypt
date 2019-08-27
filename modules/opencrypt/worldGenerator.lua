@@ -114,6 +114,11 @@ end
 
 -- Generate the next world from this generator
 function worldGenerator:nextWorld()
+
+  local rooms = {}
+
+  -- Bake
+
   -- Create a tilemap
   local t = opencrypt.Tilemap:new(32, 32)
 
