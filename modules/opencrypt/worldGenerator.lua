@@ -1,5 +1,7 @@
 local music = selfRequire('music')
 
+math.randomseed(os.time()); math.random(); math.random(); math.random();
+
 -- Called when a world this handler is assigned to ends
 local function onWorldEnd(world)
   -- Reset player_test's last beat
