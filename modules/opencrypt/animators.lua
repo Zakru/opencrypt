@@ -1,49 +1,107 @@
+-- AnimationCondition
+
+local AnimationCondition = opencrypt.Type:newChild()
+
+function AnimationCondition:new(field, operator, value)
+  local ac = opencrypt.Type.new(self)
+
+  ac.field = field
+  ac.operator = operator
+  ac.value = value
+
+  return ac
+end
+
+function AnimationCondition:entityFulfills(entity)
+  local v = entity[self.field]
+  if self.operator == '==' then
+    return v == self.value
+  elseif self.operator == '!=' or self.operator == '~=' then
+    return v ~= self.value
+  elseif self.operator == '<' then
+    return v < self.value
+  elseif self.operator == '>' then
+    return v > self.value
+  elseif self.operator == '<=' then
+    return v <= self.value
+  elseif self.operator == '>=' then
+    return v >= self.value
+  end
+
+  return false
+end
+
+-- AnimationTrack
+
+local AnimationTrack = opencrypt.Type:newChild()
+
+function AnimationTrack:new(times, frames, conditions)
+  local at = opencrypt.Type.new(self)
+
+  at.times = times
+  at.frames = frames
+  at.conditions = conditions
+
+  return at
+end
+
+function AnimationTrack:canPlay(ent)
+  for c in iter(conditions) do
+    if not c:entityFulfills(c) then return false end
+  end
+  return true
+end
+
 local Animator = opencrypt.Type:newChild()
 
-function Animator:new(tracks, frames, ent)
+function Animator:new(music, tracks, xframes,yframes, texture)
   local a = opencrypt.Type.new(self)
 
+  a.music = music
   a.tracks = tracks
-  a.frames = frames
-  a.ent = ent
+  a.xframes = xframes
+  a.yframes = yframes
+  a.texture = texture
 
-  local fullw = ent.texture:getWidth()
-  local fullh = ent.texture:getHeight()
-  local w = fullw / frames
-  local h = fullh / tracks
+  local fullw = texture:getWidth()
+  local fullh = texture:getHeight()
+  local w = fullw / xframes
+  local h = fullh / yframes
   a.quads = {}
-  for t=1,tracks do
-    a.quads[t] = {}
-    for f=1,frames do
-      a.quads[t][f] = love.graphics.newQuad((f-1) * w, (t-1) * h, w,h, fullw,fullh)
+  local i = 1
+  for t=1,yframes do
+    for f=1,xframes do
+      a.quads[i] = love.graphics.newQuad((f-1) * w, (t-1) * h, w,h, fullw,fullh)
+      i = i + 1
     end
   end
 
   return a
 end
 
-function Animator:draw(graphics, track, progress, x,y, flip)
+function Animator:getCurrentQuad(entity)
+  local progress = self.music:progressToNextBeat()
+  for track in iter(self.tracks) do
+    if track:canPlay(entity) then
+      for t,time in ipairs(track.times) do
+        if progress < time then
+          return track.frames[t]
+        end
+      end
+      return track.frames[1]
+    end
+  end
+  return 1
+end
+
+function Animator:draw(graphics, entity, x,y, flip)
   local sx = 1
   if flip then
     sx = -1
   end
-  local xoff = self.ent.texture:getWidth()/2/self.frames
-  graphics.draw(self.ent.texture, self.quads[track][math.floor(progress * self.frames) + 1], xoff+x,y, 0, sx,1, xoff)
+  local xoff = self.texture:getWidth()/2/self.xframes
+  graphics.draw(self.texture, self.quads[self:getCurrentQuad(entity)], xoff+x,y, 0, sx,1, xoff)
 end
 
-local MusicAnimator = Animator:newChild()
-
-function MusicAnimator:new(music, ...)
-  local ma = Animator.new(self, ...)
-
-  ma.music = music
-
-  return ma
-end
-
-function MusicAnimator:draw(graphics, track, x,y, flip)
-  Animator.draw(self, graphics, track, self.music:progressToNextBeat(), x,y, flip)
-end
-
-local animators = {Animator=Animator, MusicAnimator=MusicAnimator}
+local animators = {Animator=Animator, AnimationTrack=AnimationTrack, AnimationCondition=AnimationCondition}
 return animators
