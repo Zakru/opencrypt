@@ -1,4 +1,5 @@
 _G.iter = function(t)
+  if t == nil then return function() return nil end end
   local i = 0
   return function()
     i = i + 1
