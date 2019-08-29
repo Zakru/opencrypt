@@ -51,6 +51,13 @@ function Music:generateBeats(offset, interval, count)
   end
 end
 
+function Music:beatsFromFile(textResource)
+  local s = textResource:getInstance()
+  for millis in string.gmatch(s, '([^,]+)') do
+    table.insert(self.beats, tonumber(millis)/1000)
+  end
+end
+
 local MusicWorld = opencrypt.World:newChild()
 
 function MusicWorld:new(music, ...)

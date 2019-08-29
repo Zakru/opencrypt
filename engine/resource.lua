@@ -16,6 +16,8 @@ function Resource:getType(path)
     return 'audio_stream'
   elseif path:match('%.ogg$') then
     return 'audio'
+  else
+    return 'text'
   end
 end
 
@@ -24,6 +26,9 @@ function Resource:getInstance()
     return love.audio.newSource(self.path, 'static')
   elseif self.type == 'audio_stream' then
     return love.audio.newSource(self.path, 'stream')
+  elseif self.type == 'text' then
+    local contents, size = love.filesystem.read(self.path)
+    return contents
   end
 end
 

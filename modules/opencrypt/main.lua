@@ -114,7 +114,7 @@ function opencryptMod:postLoad(resources)
   -- Generate the beats for the music (just generates beats with a start
   -- time, interval and count, doesn't actually automatically generate
   -- the beats from the music)
-  mus:generateBeats(0, 0.5, 128)
+  mus:beatsFromFile(resources['music_test.mus'])
   -- Set player_test's animation to follow the music's beats
   player_test:setAnimator(animators.MusicAnimator:new(mus, 1,4, player_test))
 end
