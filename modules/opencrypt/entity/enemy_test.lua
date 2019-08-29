@@ -1,4 +1,4 @@
-local entity = require('entity')
+local entity = selfRequire('entity')
 local enemy_test = entity.JumpCreature:newChild(3)
 local instances = {}
 enemy_test.jumpHeight = 0.5

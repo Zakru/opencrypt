@@ -1,4 +1,4 @@
-local entity = require('entity')
+local entity = selfRequire('entity')
 
 local Music = opencrypt.Type:newChild()
 

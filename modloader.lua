@@ -107,20 +107,20 @@ end
 
 local _require
 local function loadGlobals(prefix)
-  _require = _G.require
-  _G.require = function(path)
-    return _require(prefix .. path)
+  _G.selfRequire = function(path)
+    return require(prefix .. path)
   end
 end
 
 local function unloadGlobals()
-  if _require then
-    _G.require = _require
-    _require = nil
-  end
+  _G.selfRequire = nil
 end
 
 function modloader.load()
+  _G.modRequire = function(mod, path)
+    return require('modules/' .. mod .. '/' .. path)
+  end
+
   local modDirs = love.filesystem.getDirectoryItems('modules')
 
   -- Load modules
@@ -132,7 +132,7 @@ function modloader.load()
       if modMain and modMain.type == 'file' then
         loadGlobals('modules/' .. namespace .. '/')
         -- Require the mod
-        modloader.mods[namespace] = require('main')
+        modloader.mods[namespace] = modRequire(namespace, 'main')
 
         -- PRELOAD MOD
         modloader.mods[namespace]:preLoad({

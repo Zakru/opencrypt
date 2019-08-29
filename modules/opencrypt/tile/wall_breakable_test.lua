@@ -1,4 +1,4 @@
-local WallTile = require('tile/wallTile')
+local WallTile = selfRequire('tile/wallTile')
 local wall_breakable_test = WallTile:new()
 wall_breakable_test.floorTile = nil
 

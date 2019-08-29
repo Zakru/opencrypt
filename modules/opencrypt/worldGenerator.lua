@@ -1,4 +1,4 @@
-local music = require('music')
+local music = selfRequire('music')
 
 -- Called when a world this handler is assigned to ends
 local function onWorldEnd(world)

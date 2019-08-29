@@ -1,5 +1,5 @@
-local entity = require('entity')
-local music = require('music')
+local entity = selfRequire('entity')
+local music = selfRequire('music')
 
 local player_test = entity.JumpCreature:newChild()
 player_test.jumpHeight = 0.5

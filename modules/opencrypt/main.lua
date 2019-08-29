@@ -1,7 +1,7 @@
 -- Assign opencrypt.Tile to a local variable for later use
 local Tile = opencrypt.Tile
 -- Require the mod's WallTile type
-local WallTile = require('tile/wallTile')
+local WallTile = selfRequire('tile/wallTile')
 
 -- Create mod object to be returned by this file
 local opencryptMod = opencrypt.Mod.new()
@@ -34,9 +34,9 @@ local world
 function opencryptMod:preLoad(registry)
   -- Require additional modules. This must be done in preLoad or outside
   -- functions.
-  animators = require('animators')
-  music = require('music')
-  worldGenerator = require('worldGenerator')
+  animators = selfRequire('animators')
+  music = selfRequire('music')
+  worldGenerator = selfRequire('worldGenerator')
 
   -- Register events
 
@@ -58,15 +58,15 @@ function opencryptMod:preLoad(registry)
   registry.registerTile('floor_brick', floor_brick)
 
   -- These tiles are special, so the files already return the tile instances
-  stairs_down = require('tile/stairs_down')
+  stairs_down = selfRequire('tile/stairs_down')
   registry.registerTile('stairs_down', stairs_down)
-  wall_breakable_test = require('tile/wall_breakable_test')
+  wall_breakable_test = selfRequire('tile/wall_breakable_test')
   registry.registerTile('wall_breakable_test', wall_breakable_test)
 
   -- Register entities
-  player_test = require('entity/player_test')
+  player_test = selfRequire('entity/player_test')
   registry.registerEntity('player_test', player_test)
-  enemy_test = require('entity/enemy_test')
+  enemy_test = selfRequire('entity/enemy_test')
   registry.registerEntity('enemy_test', enemy_test)
 
   music.MusicWorld.playerType = player_test
