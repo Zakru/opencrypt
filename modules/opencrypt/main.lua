@@ -77,7 +77,7 @@ end
 
 -- Placeholder for now. Register event listeners here. This function is
 -- called during resource loading. During this period, resources such as
--- textures for registered objects are loaded, along with everything in
+-- textures for registered entities are loaded, along with everything in
 -- the mod's `resource` folder. References to other mods' objects should
 -- be handled here, as well.
 function opencryptMod:load(registry)

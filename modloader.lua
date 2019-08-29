@@ -3,7 +3,6 @@ local modloader = {}
 modloader.mods = {}
 modloader.tiles = {}
 modloader.entities = {}
-modloader.objects = {}
 modloader.generators = {}
 modloader.events = {}
 modloader.keybinds = {}
@@ -32,15 +31,6 @@ local function registerEntityFactory(namespace)
     modloader.entities[namespace][id] = entity
     entity.registeredNamespace = namespace
     entity.registeredId = id
-  end
-end
-
-local function registerObjectFactory(namespace)
-  return function(id, object)
-    if not modloader.objects[namespace] then modloader.objects[namespace] = {} end
-    modloader.objects[namespace][id] = object
-    object.registeredNamespace = namespace
-    object.registeredId = id
   end
 end
 
@@ -150,7 +140,6 @@ function modloader.load()
           registerKeybind=registerKeybindFactory(namespace),
           registerTile=registerTileFactory(namespace),
           registerEntity=registerEntityFactory(namespace),
-          registerObject=registerObjectFactory(namespace),
           registerGenerator=registerGeneratorFactory(namespace),
         })
 
@@ -184,13 +173,6 @@ function modloader.load()
   for namespace, entities in pairs(modloader.entities) do
     for id, entity in pairs(entities) do
       entity.texture = love.graphics.newImage('modules/' .. namespace .. '/entity/' .. id .. '.png')
-    end
-  end
-
-  -- Objects
-  for namespace, objects in pairs(modloader.objects) do
-    for id, object in pairs(objects) do
-      object.texture = love.graphics.newImage('modules/' .. namespace .. '/object/' .. id .. '.png')
     end
   end
 

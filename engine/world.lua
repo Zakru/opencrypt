@@ -1,6 +1,6 @@
 local Type = require('engine/type')
 
--- A world is a combination of a Tilemap, entities and objects.
+-- A world is a combination of a Tilemap and entities.
 local World = Type:newChild()
 
 function World:new(tilemap, scale)
@@ -9,7 +9,6 @@ function World:new(tilemap, scale)
   w.tilemap = tilemap
   w.scale = scale -- Size of one tile
   w.entities = {}
-  w.objects = {}
   w.onEndListeners = {}
 
   return w
@@ -85,9 +84,6 @@ function World:endWorld()
   self.ended = true
   for e in iter(self.entities) do
     e:destroy()
-  end
-  for o in iter(self.objects) do
-    o:destroy()
   end
   for l,listener in ipairs(self.onEndListeners) do
     listener(self)
