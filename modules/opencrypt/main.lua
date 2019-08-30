@@ -116,9 +116,8 @@ function opencryptMod:postLoad(resources)
   -- the beats from the music)
   mus:beatsFromFile(resources['music_test.mus'])
   -- Set player_test's animation to follow the music's beats
-  player_test:setAnimator(animators.Animator:new(mus, {
-    animators.AnimationTrack:new({0.1, 0.4, 0.7, 1}, {1,2,3,4}, {})
-  }, 4,1, player_test.texture))
+  player_test:setAnimator(animators.Animator:fromJSON(resources['player_test.anim']:getInstance()))
+  player_test.animator.music = mus
 end
 
 -- Called when a world this handler is assigned to ends

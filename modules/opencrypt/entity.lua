@@ -65,7 +65,7 @@ end
 function JumpCreature:draw(graphics)
   local x,y = self:getVisualOrigin(graphics)
   if self.animator then
-    self.animator:draw(graphics, 1, x, y, self.flip)
+    self.animator:draw(graphics, self, x, y, self.flip)
   else
     opencrypt.Creature.draw(self, graphics)
   end

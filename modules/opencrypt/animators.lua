@@ -1,3 +1,5 @@
+local JSON = require('JSON')
+
 -- AnimationCondition
 
 local AnimationCondition = opencrypt.Type:newChild()
@@ -54,17 +56,13 @@ end
 
 local Animator = opencrypt.Type:newChild()
 
-function Animator:new(music, tracks, xframes,yframes, texture)
+function Animator:new(tracks, xframes,yframes, fullw,fullh)
   local a = opencrypt.Type.new(self)
 
-  a.music = music
   a.tracks = tracks
   a.xframes = xframes
   a.yframes = yframes
-  a.texture = texture
 
-  local fullw = texture:getWidth()
-  local fullh = texture:getHeight()
   local w = fullw / xframes
   local h = fullh / yframes
   a.quads = {}
@@ -99,8 +97,37 @@ function Animator:draw(graphics, entity, x,y, flip)
   if flip then
     sx = -1
   end
-  local xoff = self.texture:getWidth()/2/self.xframes
-  graphics.draw(self.texture, self.quads[self:getCurrentQuad(entity)], xoff+x,y, 0, sx,1, xoff)
+  local xoff = entity.texture:getWidth()/2/self.xframes
+  graphics.draw(entity.texture, self.quads[self:getCurrentQuad(entity)], xoff+x,y, 0, sx,1, xoff)
+end
+
+function Animator:fromJSON(json)
+  local data = JSON:decode(json)
+
+  if data then
+    if data.tracks and data.xFrames and data.yFrames and data.texWidth and data.texHeight then
+      local tracks = {}
+
+      for track in iter(data.tracks) do
+        local times = track.times
+        local frames = track.frames
+        local conditions
+
+        if track.conditions then
+          conditions = {}
+          for condition in iter(track.conditions) do
+            conditions[#conditions+1] = AnimationCondition:new(condition.field, condition.operator, condition.value)
+          end
+        end
+
+        tracks[#tracks+1] = AnimationTrack:new(times, frames, conditions)
+      end
+
+      return Animator:new(tracks, data.xFrames,data.yFrames, data.texWidth,data.texHeight)
+    end
+  end
+
+  error('Invalid animator data')
 end
 
 local animators = {Animator=Animator, AnimationTrack=AnimationTrack, AnimationCondition=AnimationCondition}
