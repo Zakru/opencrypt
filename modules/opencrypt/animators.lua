@@ -78,7 +78,7 @@ function Animator:new(tracks, xframes,yframes, fullw,fullh)
 end
 
 function Animator:getCurrentQuad(entity)
-  local progress = self.music:progressToNextBeat()
+  local progress = entity.world.music:progressToNextBeat()
   for track in iter(self.tracks) do
     if track:canPlay(entity) then
       for t,time in ipairs(track.times) do

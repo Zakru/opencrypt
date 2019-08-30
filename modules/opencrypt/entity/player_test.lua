@@ -60,8 +60,8 @@ function player_test:update(dt, world)
   if player_test.shouldMove then
     player_test.shouldMove = false
     if not self.world.stop then
-      local progress = self.animator.music:progressToNextBeat()
-      local thisBeat = self.animator.music.beatIndex
+      local progress = self.world.music:progressToNextBeat()
+      local thisBeat = self.world.music.beatIndex
       if progress < 0.5 then
         thisBeat = thisBeat - 1
       end

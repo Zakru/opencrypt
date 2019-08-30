@@ -111,13 +111,10 @@ function opencryptMod:postLoad(resources)
   -- Create a Music instance from the test music
   mus = music.Music:new(resources['music_test.str.ogg'])
   worldGenerator.music = mus
-  -- Generate the beats for the music (just generates beats with a start
-  -- time, interval and count, doesn't actually automatically generate
-  -- the beats from the music)
+  -- Get the music's beats from a file
   mus:beatsFromFile(resources['music_test.mus'])
   -- Set player_test's animation to follow the music's beats
   player_test:setAnimator(animators.Animator:fromJSON(resources['player_test.anim']:getInstance()))
-  player_test.animator.music = mus
 end
 
 -- Called when a world this handler is assigned to ends

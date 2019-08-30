@@ -94,8 +94,8 @@ function MusicWorld:update(dt)
   if not self.freeze then
     -- Check if a player entity has missed a beat.
     for player in iter(table.filter(self.entities, self:playerFilter())) do
-      local progress = player.animator.music:progressToNextBeat()
-      local thisBeat = player.animator.music.beatIndex
+      local progress = self.music:progressToNextBeat()
+      local thisBeat = self.music.beatIndex
       if progress < 0.5 then
         thisBeat = thisBeat - 1
       end
