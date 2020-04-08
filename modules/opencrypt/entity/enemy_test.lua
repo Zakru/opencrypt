@@ -1,3 +1,20 @@
+[[
+Copyright 2019 Zakru
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+]]
+
 local entity = selfRequire('entity')
 local enemy_test = entity.JumpCreature:newChild(3)
 local instances = {}
@@ -44,7 +61,7 @@ function enemy_test:chooseDirection(disregardEntities)
   if self.target then
     local xDiff = self.target.x - self.x
     local yDiff = self.target.y - self.y
-    
+
     function walkable(x,y)
       local tile = self.world.tilemap:getTileAt(self.x + x, self.y + y)
       local e = disregardEntities or table.all(self.world:getEntitiesAt(self.x + x, self.y + y), function(v)

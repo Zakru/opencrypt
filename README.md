@@ -10,8 +10,6 @@ Disclaimer: This project was not made to re-create CotND, but to create a new, h
 
 A tool may be created in the future which allows for copying the contents of a legitimate copy of CotND into a format compatible with OpenCrypt, but which will not distribute the content.
 
-OpenCrypt and the contents of this repository have absolutely no warranty, express or implied. A better license should probably be used at some point.
-
 ## How to play
 
 To play this game from source, you will need [LÖVE](https://love2d.org/). Once you have it installed, open the command line, navigate to the root of the repository and run the following:

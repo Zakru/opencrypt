@@ -1,3 +1,20 @@
+[[
+Copyright 2019 Zakru
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+]]
+
 local Tile = require('engine/tile')
 local Type = require('engine/type')
 
@@ -59,13 +76,13 @@ end
 
 function Tilemap:setTileAt(x,y, tile)
   if x < 1 or x > self.width or y < 1 or y > self.height then
-    return 
+    return
   end
 
   local t = self.tiles[y][x]
   if t ~= 0 and self.palette[t] and self.palette[t].count == 1 then
     self.inversePalette[self.palette[t].tile] = nil
-    self.palette[t] = nil 
+    self.palette[t] = nil
   elseif t ~= 0 then
     self.palette[t].count = self.palette[t].count - 1
   end
