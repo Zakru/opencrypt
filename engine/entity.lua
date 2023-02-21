@@ -11,7 +11,7 @@ function Entity:new(world, x,y)
   return e
 end
 
-[[
+--[[
 Copyright 2019 Zakru
 
 This program is free software: you can redistribute it and/or modify
